@@ -1,0 +1,237 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded">
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- Customer Facing Merchant Checkout -->
+
+    <div class="container-mobile">
+
+        <div class="row pt-3">
+            <div class="col-12">
+                <button class="btn" (click)="detailPesanan()" id="backButton" type="button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span style="font-size: 16px; font-weight: bold">Detail Pesanan</span>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row pl-3 pr-3">
+            <div class="col-12">
+                <span class="text-muted">Nomor Pesanan</span><br>
+                <span><b>{{orderDetail?.invoiceNumber}}</b></span><br><br>
+                <span class="text-muted">Tanggal Pemesanan</span><br>
+                <span><b>{{orderDetail?.createdDate | date:'dd MMMM yyyy, HH:mm:ss z'}}</b></span>
+
+                <div class="pt-3"
+                     *ngIf="orderDetail?.milestones[0]?.createdDate != null && orderDetail?.milestones[1]?.createdDate == null">
+                    <button class="btn btn-primary" id="prosesPesanan" type="button" (click)="prosesPesanan()">
+                        PROSES PESANAN
+                    </button>
+                </div>
+
+                <div class="pt-3"
+                     *ngIf="orderDetail?.milestones[1]?.createdDate != null && orderDetail?.milestones[2]?.createdDate == null">
+                    <button class="btn btn-primary" id="kirimPesanan" type="button" (click)="kirimPesanan()">
+                        KIRIM PESANAN
+                    </button>
+                </div>
+
+                <hr>
+            </div>
+        </div>
+
+
+        <div class="row pl-3 pr-3">
+            <div class="col-12">
+                <h4>Alamat Pengiriman</h4>
+                <br>
+                <span><b>{{orderDetail?.customer?.name}}</b></span>
+                <br>
+                <span>{{orderDetail?.customer?.phoneNumber}}</span>
+                <br>
+                <span>{{orderDetail?.customer?.detailAddress}}</span>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row pl-3 pr-3">
+            <div class="col-12">
+                <span><b>{{orderDetail?.shipping?.name + ' - ' + orderDetail?.shipping?.rateName}}</b></span>
+                <span> (Akan diterima pada {{ addDate(1, 3, orderDetail.createdDate) }})</span>
+                <br>
+                <!-- Menampilkan tracking_id -->
+                <span *ngIf="orderDetail?.milestones[2]?.createdDate != null && orderDetail?.shipping?.trackingId != '' && orderDetail?.shipping?.trackingId != null && (orderDetail?.shipping?.awbNumber == '' || orderDetail?.shipping?.awbNumber == null)">
+                        Tracking Id: {{orderDetail.shipping.trackingId}}
+                    <br>
+                    <span style="text-align: justify; display:block;">Silahkan untuk letakkan nomor resi/tracking pada paket anda, dan bisa untuk search via <a
+                            href="https://shipper.id/tracking">shipper.id/tracking</a> untuk memantau perjalanan paket yang anda kirimkan. Pesanan yang diproses sebelum 15.00 akan diambil paketnya pada hari tersebut, selebihnya akan diambil di esok hari.</span>
+                </span>
+                <!-- Jika createDate timeline PROCESSING sudah ada -->
+                <span *ngIf="orderDetail?.milestones[2]?.createdDate != null && orderDetail?.shipping?.awbNumber != '' && orderDetail?.shipping?.awbNumber != null ">
+                        No. Resi: {{orderDetail.shipping.awbNumber}}
+                    </span>
+                <!-- Tampilkan Contoh tracking_id hanya di environment selain Production dengan kondisi apabila tracking_id dan awb_number tidak ada-->
+                <span *ngIf="orderDetail?.milestones[2]?.createdDate != null && (orderDetail?.shipping?.trackingId == '' || orderDetail?.shipping?.trackingId == null) && (orderDetail?.shipping?.awbNumber == '' || orderDetail?.shipping?.awbNumber == null) && orderDetail?.shipping?.digitalGoods == false && envUrl !== envSimulatorNotExist">
+                        Tracking Id: 5j08725 <i class="fas fa-info-circle text-primary ml-2"
+                                                ngbTooltip='Tracking Id Simulasi'></i>
+                    <br>
+                    <span style="text-align: justify; display:block;">Silahkan untuk letakkan nomor resi/tracking pada paket anda, dan bisa untuk search via <a
+                            href="https://shipper.id/tracking">shipper.id/tracking</a> untuk memantau perjalanan paket yang anda kirimkan. Pesanan yang diproses sebelum 15.00 akan diambil paketnya pada hari tersebut, selebihnya akan diambil di esok hari.</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="row p-3">
+            <div class="col-12">
+
+                <div class="timeline timeline-vertical timeline-progress timeline-primary">
+                    <ul>
+                        <!-- CONFIRMED -->
+                        <li [ngClass]="{'is-active': (orderDetail?.milestones[0]?.createdDate !== null && orderDetail?.milestones[1]?.createdDate == null)}">
+                            <div class="description">
+                                <div class="desc_title"><b> Pembayaran Dikonfirmasi</b></div>
+                                <div class="desc_content">
+                                    Pembayaran telah dikofirmasi dan <br> akan diteruskan ke penjual
+                                </div>
+                                <div class="desc_time"
+                                     style="width: 160px"> {{orderDetail?.milestones[0]?.createdDate | date:'dd MMMM yyyy, HH:mm:ss'}} </div>
+                            </div>
+                        </li>
+                        <!-- SENDING -->
+                        <li [ngClass]="{'is-finished': (orderDetail?.milestones[0]?.createdDate !== null && orderDetail?.milestones[1]?.createdDate == null),
+                            'is-active': (orderDetail?.milestones[1]?.createdDate !== null && orderDetail?.milestones[2]?.createdDate == null)}">
+                            <div class="description">
+                                <div class="desc_title"><b> Pesanan Diproses</b></div>
+                                <div class="desc_content">
+                                    Pesanan Anda sedang diproses oleh penjual
+                                </div>
+                                <div class="desc_time"
+                                     style="width: 160px"> {{orderDetail?.milestones[1]?.createdDate | date:'dd MMMM yyyy, HH:mm:ss'}} </div>
+                            </div>
+                        </li>
+                        <!-- PROCESSING -->
+                        <li *ngIf="orderDetail?.milestones[0]?.createdDate != null && orderDetail?.milestones[1]?.createdDate != null"
+                            [ngClass]="{'is-finished': (orderDetail?.milestones[1]?.createdDate !== null && orderDetail?.milestones[2]?.createdDate == null),
+                            'is-active': (orderDetail?.milestones[2]?.createdDate !== null && orderDetail?.milestones[3]?.createdDate == null)}">
+                            <div class="description">
+                                <div class="desc_title"><b> Pesanan Dikirim</b></div>
+                                <div class="desc_content">
+                                    Pesanan telah dikirim dari <br> {{orderDetail.merchant.name}}
+                                </div>
+                                <div class="desc_time"
+                                     style="width: 160px"> {{orderDetail?.milestones[2]?.createdDate | date:'dd MMMM yyyy, HH:mm:ss'}} </div>
+                            </div>
+                        </li>
+                        <!-- DELIVERED -->
+                        <li *ngIf="orderDetail?.milestones[1]?.createdDate != null && orderDetail?.milestones[2]?.createdDate != null"
+                            [ngClass]="{'is-finished': (orderDetail?.milestones[2]?.createdDate !== null && orderDetail?.milestones[3]?.createdDate == null),
+                            'is-active': (orderDetail?.milestones[3]?.createdDate !== null && orderDetail?.milestones[4]?.createdDate == null)}">
+                            <div class="description">
+                                <div class="desc_title"><b> Pesanan Telah Sampai di Tujuan</b></div>
+                                <div class="desc_content">
+                                    Pesanan akan segera diterima <br> sesuai estimasi waktu
+                                </div>
+                                <div class="desc_time"
+                                     style="width: 160px"> {{orderDetail?.milestones[3]?.createdDate | date:'dd MMMM yyyy, HH:mm:ss'}} </div>
+                            </div>
+                        </li>
+                        <!-- DONE -->
+                        <li *ngIf="orderDetail?.milestones[2]?.createdDate != null && orderDetail?.milestones[3]?.createdDate != null"
+                            class="is-finished">
+                            <div class="description">
+                                <div class="desc_title"><b> Pesanan Selesai</b></div>
+                                <div class="desc_content">
+                                    Transaksi sukses dan pembeli <br> telah menerima pesanan
+                                </div>
+                                <div class="desc_time"
+                                     style="width: 160px"> {{orderDetail?.milestones[4]?.createdDate | date:'dd MMMM yyyy, HH:mm:ss'}} </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr>
+            </div>
+        </div>
+
+        <div class="row pl-3 pr-3 mb-3">
+            <div class="col-12">
+                <img [src]="orderDetail?.merchant?.image" style="height: 24px; width: 24px; border-radius: 50%;"/>
+                <span class="ml-3" style="font-size: 16px; font-weight: bold;">{{orderDetail?.merchant?.name}}</span>
+            </div>
+        </div>
+
+        <div *ngFor="let product of orderDetail.products; let i = index">
+            <div *ngFor="let variant of product.items; let i = index">
+                <div class="row mb-2 px-3">
+                    <div class="col-2">
+                        <img [src]="product.image" style="height: 64px; width: 100%"/>
+                    </div>
+                    <div class="col-10">
+                        <div class="row">
+                            <div class="col-12">
+                                <span style="font-size: 16px;">{{product.name}}</span>
+                                <h6 class="text-muted">{{variant.color}}</h6>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-10">
+                                <h4>{{variant.price | currency:'Rp ':'symbol-narrow':'1.0'}}</h4>
+                            </div>
+                            <div class="col-2">
+                                <span style="font-size: 16px;">{{'x ' + variant.quantity}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row p-3">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <span><b>Total Harga ({{totalProduct}} Produk)</b></span>
+                        <br>
+                        <span><b>Ongkos Kirim</b></span>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span><b>{{orderDetail.payment.itemsPrice | currency:'Rp ':'symbol-narrow':'1.0'}}</b></span>
+                        <br>
+                        <span><b>{{orderDetail.payment.shippingPrice | currency:'Rp ':'symbol-narrow':'1.0'}}</b></span>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-6">
+                        <span><b>Total Pembayaran</b></span>
+                        <br>
+                        <span><b>Metode Pembayaran</b></span>
+                        <br>
+                        <span><b>Asuransi Pengiriman</b></span>
+                    </div>
+                    <div class="col-6 text-right">
+                        <h4 class="text-success">
+                            <b>{{orderDetail.payment.amount | currency:'Rp ':'symbol-narrow':'1.0'}}</b></h4>
+                        <span><b>{{orderDetail.payment.channel}}</b></span><br>
+                        <span><b>{{orderDetail.payment.insurancePrice | currency:'Rp ':'symbol-narrow':'1.0'}}</b></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+</ng-template>

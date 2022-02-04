@@ -1,0 +1,155 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+        <!--Header-->
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Pengaturan Toko</h3>
+                <p>Atur jasa pengiriman dan profile untuk toko</p>
+            </div>
+        </div>
+
+        <ul ngbNav #nav="ngbNav" class="nav-tabs">
+            <!-- Store Configuration -->
+            <li ngbNavItem>
+                <a class="" ngbNavLink>Informasi Toko</a>
+                <ng-template ngbNavContent>
+                    <div class="card card-body">
+
+                        <div class="row">
+                            <div class="col-12 col-md-9">
+
+                        <form (ngSubmit)="submitConfigurationStoreLocation()" [formGroup]="configurationStoreLocationForm" class="pt-10" id="configurationStoreLocationForm">
+
+                            <div class="form-group">
+                                <div class="col"><h5>Gambar Toko</h5></div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="responsive-layout justify-content-start w-100">
+                                            <div class="form-group">
+                                                <div class="image-upload d-flex justify-content-center" style="border-style: dashed; width: 150px; height: 150px;">
+                                                    <label style="margin-top: auto; margin-bottom: auto;">
+                                                        <div *ngIf="!previewStoreImage">
+                                                            <i class="fas fa-store fa-8x"></i>
+                                                        </div>
+                                                        <div *ngIf="previewStoreImage">
+                                                            <img [src]="previewStoreImage" class="image-container" />
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mt-auto p-2">
+                                                <label class="btn btn-secondary ml-auto" for="file-input1">
+                                                    <input id="file-input1" type="file" class="btn" name="image" accept="image/png, image/jpg, image/jpeg" (change)="fileProgress($event)" formControlName="image" hidden/>
+                                                    Pilih Foto
+                                                </label>
+                                                <br>
+                                                <span>Maximum size 1 MB. File must be .jpg or .png</span>
+                                                <div class="text-danger" *ngIf="configurationStoreLocationForm.get('image').hasError('required') && (configurationStoreLocationForm.get('image').dirty || configurationStoreLocationForm.get('image').touched)">*This field is cannot be left empty</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col"><h5>Nama <i class="fas fa-info-circle" ngbTooltip='Nama toko tidak dapat diubah, silahkan kunjungi Menu Business Activation untuk perubahan Nama Toko'></i></h5></div>
+                                <div class="col"><input class="form-control dk-text-input" id="name" placeholder="Store Name" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" readonly [ngModelOptions]="{standalone: true}" [ngModel]="productLinkBusiness"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <ng-template #tipContent><div style="text-align:left;"><b>Link Toko</b><br>Atur Link Tokomu. Maksimal 25 Karakter</div></ng-template>
+                                <div class="col"><h5>Link Toko Online <i class="fas fa-info-circle" data-html="true" [ngbTooltip]="tipContent"></i></h5></div>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text dk-span-group" id="linkStore">{{storeLinkHost}}</span>
+                                        </div>
+                                        <input class="form-control dk-text-input" formControlName="link" id="link" placeholder="Link-Toko" required type="text" pattern="^[a-zA-Z0-9._-]+$">
+                                    </div>
+                                </div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('link').hasError('required') && (configurationStoreLocationForm.get('link').dirty || configurationStoreLocationForm.get('link').touched)">*This field is cannot be left empty</div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('link').hasError('pattern')">*This field is not valid input text</div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('link').hasError('maxlength')">*This field max length is 25</div>
+                            </div>
+
+                            <div class="d-flex bd-highlight mb-3 col">
+                                <button id="btnShop" type="button" class="btn btn-secondary btn-sm" (click)="btnShopClick()" [disabled]="disableBtnShop()">Lihat Toko</button>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col"><h5>Nomor Handphone</h5></div>
+                                <div class="col input-group">
+                                    <input class="form-control dk-text-input" formControlName="phoneNumber" id="phoneNumber" placeholder="6281197216322" required type="text" pattern="^[1-9][0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                </div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('phoneNumber').hasError('required') && (configurationStoreLocationForm.get('phoneNumber').dirty || configurationStoreLocationForm.get('phoneNumber').touched)">*This field is cannot be left empty</div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('phoneNumber').hasError('pattern')">*This field is not valid input text</div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col"><h5>Email</h5></div>
+                                <div class="col"><input class="form-control dk-text-input" formControlName="email" id="email" placeholder="Masukkan email" required type="text"></div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('email').hasError('required') && (configurationStoreLocationForm.get('email').dirty || configurationStoreLocationForm.get('email').touched)">*This field is cannot be left empty</div>
+                                <div class="col text-danger" *ngIf="configurationStoreLocationForm.get('email').hasError('invalidEmail')">*This field is not valid input text</div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col"><h5>Alamat (Kode POS-Kota-Provinsi)</h5></div>
+                                <div class="col">
+                                    <ng-select [clearable]="false" formControlName="postalCodeCityProvince" [items]="location.postalCodeCityProvince" bindLabel="name"  [multiple]="false" [closeOnSelect]="true">
+                                    </ng-select>
+                                    <p class="text-danger" *ngIf="configurationStoreLocationForm.get('postalCodeCityProvince').hasError('required')  && (configurationStoreLocationForm.get('postalCodeCityProvince').dirty || configurationStoreLocationForm.get('postalCodeCityProvince').touched)">*This field is cannot be left empty</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col"><h5>Alamat Toko <i class="fas fa-info-circle" ngbTooltip='Alamat akan digunakan sebagai asal pengiriman'></i></h5></div>
+                                <div class="col">
+                                    <textarea formControlName="address" rows="4" class="form-control dk-text-input" id="address" placeholder="Masukkan detail alamat lengkap toko Anda" required pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$"></textarea>
+                                    <p class="text-danger" *ngIf="configurationStoreLocationForm.get('address').hasError('required')  && (configurationStoreLocationForm.get('address').dirty || configurationStoreLocationForm.get('address').touched)">*This field is cannot be left empty</p>
+                                    <p class="text-danger" *ngIf="configurationStoreLocationForm.get('address').hasError('pattern')">*This field is not valid input text</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex bd-highlight mb-3 col">
+
+                                <div class="mr-auto bd-highlight align-middle">
+                                    <button id="backButton" type="button" class="btn btn-secondary ml-auto">
+                                        <i class="fa fa-arrow-left in-icon"></i> BATAL
+                                    </button>
+                                </div>
+
+                                <div class="p-2 bd-highlight align-middle">
+                                    <button class="btn btn-primary ml-auto" id="save" type="submit" [disabled]="!configurationStoreLocationForm.valid" >
+                                        SIMPAN
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        </div>
+                    </div>
+
+                    </div>
+
+                </ng-template>
+            </li>
+<!--            <li ngbNavItem [disabled]="true">-->
+<!--                <a class="" ngbNavLink disabled>Pengiriman</a>-->
+<!--                <ng-template ngbNavContent>-->
+<!--                    <p>No Content</p>-->
+<!--                </ng-template>-->
+<!--            </li>-->
+        </ul>
+        <div [ngbNavOutlet]="nav"></div>
+
+
+</ng-template>

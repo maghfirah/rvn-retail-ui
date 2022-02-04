@@ -1,0 +1,4 @@
+<div class="content-wrapper">
+    <app-alert *ngIf="alertService.isAlert()" [data]="alertService.getProps()"></app-alert>
+    <router-outlet></router-outlet>
+</div>

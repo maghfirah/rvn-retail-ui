@@ -1,0 +1,377 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- List Inventory -->
+    <ng-container *ngIf="pageName === 'list'">
+        <app-inventory-list></app-inventory-list>
+    </ng-container>
+
+    <!-- Add Inventory Data-->
+    <ng-container *ngIf="pageName === 'add'">
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Tambah Produk</h3>
+                <p>Tambahkan produk dan mulailah untuk menjual produk Anda</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <form [formGroup]="addProductForm" class="pt-10" id="addProductForm">
+
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Tipe Produk</b></div>
+                                    <small>Pilih jika Anda ingin menambahkan
+                                        <span class="text-primary"style="cursor: pointer;" [autoClose]="'inside'"
+                                              ngbPopover="Contoh: Voucher Pulsa, Token Listrik, Voucher Belanja, Game, dll, yang tidak memerlukan pengiriman"
+                                              popoverTitle="Produk Digital">
+                                        produk digital
+                                        </span>
+                                    yang tidak membutuhkan pengiriman</small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline mr-5">
+                                            <input class="form-check-input" type="radio" name="digitalGoods" id="physicalGoods" formControlName="digitalGoods" [value]=false (change)="validateDigitalGoods()" />
+                                            <label class="form-check-label" for="physicalGoods">Produk fisik</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="digitalGoods" id="digitalGoods" formControlName="digitalGoods" [value]=true (change)="validateDigitalGoods()" />
+                                            <label class="form-check-label" for="digitalGoods">Produk digital</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Foto Produk</b></div>
+                                    <small>
+                                        Maksimal ukuran gambar 1 MB atau minimum 300 x 300 px. Format gambar
+                                        .jpg .jpeg atau .png
+                                    </small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <div class="form-group">
+                                        <div class="row mt-3 px-3">
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group d-flex justify-content-center">
+                                                    <div class="image-upload d-flex justify-content-center" style="border-style: dashed; width: 220px; height: 220px;">
+                                                        <label for="file-input1" style="margin-top: auto; margin-bottom: auto; cursor: pointer">
+                                                            <div *ngIf="!previewImageProduct1">
+                                                                <i class="fas fa-plus-circle text-primary"></i>
+                                                                <p>Pilih Gambar</p>
+                                                            </div>
+                                                            <div *ngIf="previewImageProduct1">
+                                                                <img [src]="previewImageProduct1" class="image-container"/>
+                                                            </div>
+                                                        </label>
+                                                        <input id="file-input1" type="file" name="image" accept="image/png, image/jpg, image/jpeg" (change)="fileProgress($event, 'previewImageProduct1')" formControlName="image1"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group d-flex justify-content-center text-danger" *ngIf="addProductForm.get('image1').hasError('required') && (addProductForm.get('image1').dirty || addProductForm.get('image1').touched)">*This field is cannot be left empty</div>
+                                            </div>
+
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group d-flex justify-content-center">
+                                                    <div class="image-upload d-flex justify-content-center" style="border-style: dashed; width: 220px; height: 220px;">
+                                                        <label for="file-input2" style="margin-top: auto; margin-bottom: auto; cursor: pointer">
+                                                            <div *ngIf="!previewImageProduct2">
+                                                                <i class="fas fa-plus-circle text-primary"></i>
+                                                                <p>Pilih Gambar</p>
+                                                            </div>
+                                                            <div *ngIf="previewImageProduct2">
+                                                                <img [src]="previewImageProduct2" class="image-container"/>
+                                                            </div>
+                                                        </label>
+                                                        <input id="file-input2" type="file" name="image" accept="image/png, image/jpg, image/jpeg"  (change)="fileProgress($event, 'previewImageProduct2')" formControlName="image2"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group d-flex justify-content-center text-danger" *ngIf="addProductForm.get('image2').hasError('required') && (addProductForm.get('image2').dirty || addProductForm.get('image2').touched)">*This field is cannot be left empty</div>
+                                            </div>
+
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group d-flex justify-content-center">
+                                                    <div class="image-upload d-flex justify-content-center" style="border-style: dashed; width: 220px; height: 220px;">
+                                                        <label for="file-input3" style="margin-top: auto; margin-bottom: auto; cursor: pointer">
+                                                            <div *ngIf="!previewImageProduct3">
+                                                                <i class="fas fa-plus-circle text-primary"></i>
+                                                                <p>Pilih Gambar</p>
+                                                            </div>
+                                                            <div *ngIf="previewImageProduct3">
+                                                                <img [src]="previewImageProduct3" class="image-container"/>
+                                                            </div>
+                                                        </label>
+                                                        <input id="file-input3" type="file" name="image" accept="image/png, image/jpg, image/jpeg"  (change)="fileProgress($event, 'previewImageProduct3')" formControlName="image3"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group d-flex justify-content-center text-danger" *ngIf="addProductForm.get('image3').hasError('required') && (addProductForm.get('image3').dirty || addProductForm.get('image3').touched)">*This field is cannot be left empty</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Nama Produk</b></div>
+                                    <small> Cantumkan maksimal 238 karakter terdiri dari jenis produk, merek, dan keterangan seperti warna, bahan, atau tipe </small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <input class="form-control dk-text-input" formControlName="name" id="name" placeholder="Baju lengan panjang" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" maxlength="238">
+                                    <div class="text-danger" *ngIf="addProductForm.get('name').hasError('required') && (addProductForm.get('name').dirty || addProductForm.get('name').touched)">*This field is cannot be left empty</div>
+                                    <div class="text-danger" *ngIf="addProductForm.get('name').hasError('pattern')">*This field is not valid input text</div>
+                                </div>
+                            </div>
+
+                            <hr class="row p-3 my-2">
+
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Kategori</b></div>
+                                    <small> Pilih kategori yang sesuai dengan produk Anda </small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <ng-select [multiple]="false" formControlName="category" id="category" placeholder="Pilih kategori produk">
+                                        <ng-option *ngFor="let categoryProduct of listCategoryProduct" [value]="categoryProduct">{{categoryProduct}}</ng-option>
+                                    </ng-select>
+                                    <div class="text-danger" *ngIf="addProductForm.get('category').hasError('required') && (addProductForm.get('category').dirty || addProductForm.get('category').touched)">*This field is cannot be left empty</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Kondisi</b></div>
+                                    <small> Pilih kondisi produk yang dijual </small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline mr-5">
+                                            <input type="radio" id="conditionNew" [value]=productCondition.New formControlName="condition">
+                                            <label class="form-check-label" for="conditionNew">Baru</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" id="conditionUsed" [value]=productCondition.Used formControlName="condition">
+                                            <label class="form-check-label" for="conditionUsed">Bekas</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                    <div><b>Deskripsi Produk</b></div>
+                                    <small>
+                                        Pastikan deskripsi produk memuat spesifikasi, ukuran, bahan, masa
+                                        berlaku, dan lainnya. Cantumkan maksimal 260 karakter agar pembeli
+                                        semakin mudah mengerti produk Anda
+                                    </small>
+                                </div>
+                                <div class="col-12 col-md-9">
+                                    <div class="form-group">
+                                        <textarea class="form-control dk-text-input" formControlName="description" id="description" placeholder="Deskripsi produk anda" required pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" rows="4" maxlength="260"></textarea>
+                                        <div class="text-danger" *ngIf="addProductForm.get('description').hasError('required') && (addProductForm.get('description').dirty || addProductForm.get('description').touched)">*This field is cannot be left empty</div>
+                                        <div class="text-danger" *ngIf="addProductForm.get('description').hasError('pattern')">*This field is not valid input text</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-3" style="margin-bottom: auto; margin-top: auto">
+                                    <h4 style="margin-bottom: auto; margin-top: auto">Informasi Penjualan</h4>
+                                </div>
+                                <div class="col-9">
+                                    <button class="btn btn-secondary btn-sm ml-auto" style="float: right" *ngIf="variants.length < 5" type="button" id="addVariant" (click)="addNewVariant()">
+                                        <i class="fa fa-plus in-icon"></i> Tambah Varian
+                                    </button>
+
+                                    <button class="btn btn-secondary btn-sm ml-auto mr-3" style="float: right" *ngIf="variants.length > 1" type="button" id="deleteVariant" (click)="deleteVariant()">
+                                        <i class="fa fa-minus in-icon"></i> Hapus Varian
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <!-- Varian Produk -->
+                            <div formArrayName="variants">
+                                <div *ngFor="let variant of addProductForm.get('variants')['controls']; let i=index;" [formGroupName]="i">
+                                    <div class="row px-3 mb-3">
+                                        <div class="col-12 rounded p-3" style="border: 1px dashed #cccccc">
+                                            <div class="row mb-2">
+                                                <div class="d-flex px-3 mb-3 w-100 align-items-center">
+                                                    <h4 class="d-inline-block m-0">Varian {{i+1}}</h4>
+<!--                                                    <div class="custom-control custom-switch d-inline-block">-->
+<!--                                                        <input id="s1" type="checkbox" class="switch" />-->
+<!--                                                        <label for="s1">Aktif</label>-->
+<!--                                                    </div>-->
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Nama Varian</b></div>
+                                                    <small> Varian nama dari produk yang Anda jual </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <div class="form-group">
+                                                        <input class="form-control dk-text-input" formControlName="color" id="color-{{i}}" placeholder="Merah" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$">
+                                                        <div class="text-danger" *ngIf="variant.get('color').hasError('required') && (variant.get('color').dirty || variant.get('color').touched)">*This field is cannot be left empty</div>
+                                                        <div class="text-danger" *ngIf="variant.get('color').hasError('pattern')">*This field is not valid input text</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Harga Varian</b></div>
+                                                    <small> Harga dari varian produk yang Anda jual. Harga minimum Rp 10.000, tanpa titik </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <div class="input-group">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text dk-span-group" id="currency">Rp</span>
+                                                        </div>
+                                                        <input class="form-control dk-text-input" formControlName="price" id="price-{{i}}" placeholder="10000" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                    </div>
+                                                    <div class="text-danger" *ngIf="variant.get('price').hasError('required') && (variant.get('price').dirty || variant.get('price').touched)">*This field is cannot be left empty</div>
+                                                    <div class="text-danger" *ngIf="variant.get('price').hasError('pattern')">*This field is not valid input text</div>
+                                                    <div class="text-danger" *ngIf="variant.get('price').hasError('min')">*Minimal harga 10000</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Stok Varian</b></div>
+                                                    <small> Jumlah varian produk yang dijual </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <input class="form-control dk-text-input" formControlName="stock" id="stock-{{i}}" placeholder="1" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                    <div class="text-danger" *ngIf="variant.get('stock').hasError('required') && (variant.get('stock').dirty || variant.get('stock').touched)">*This field is cannot be left empty</div>
+                                                    <div class="text-danger" *ngIf="variant.get('stock').hasError('pattern')">*This field is not valid input text</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Minimal Pembelian</b></div>
+                                                    <small> Minimal pembelian varian produk </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <input class="form-control dk-text-input" formControlName="minimumOrder" id="minimumOrder-{{i}}" placeholder="1" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                    <div class="text-danger" *ngIf="variant.get('minimumOrder').hasError('required') && (variant.get('minimumOrder').dirty || variant.get('minimumOrder').touched)">*This field is cannot be left empty</div>
+                                                    <div class="text-danger" *ngIf="variant.get('minimumOrder').hasError('pattern')">*This field is not valid input text</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- If category product is Digital Goods Hide Berat dan Ukuran Product -->
+                                            <div class="row mb-4" *ngIf="addProductForm.get('digitalGoods').value !== true">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Berat Varian</b></div>
+                                                    <small> Berat dari varian produk setelah dikemas. Gunakan titik untuk bilangan desimal </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <div class="input-group">
+                                                        <input class="form-control dk-text-input" formControlName="weight" id="weight-{{i}}" placeholder="0.1" required type="text" pattern="^[0-9]+(\.[0-9]{1,2})?$" (keypress)="validationService.decimalOnly($event)">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text dk-span-group" id="unit">Kilogram (kg)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-danger" *ngIf="variant.get('weight').hasError('required') && (variant.get('weight').dirty || variant.get('weight').touched)">*This field is cannot be left empty</div>
+                                                    <div class="text-danger" *ngIf="variant.get('weight').hasError('pattern')">*This field is not valid input text</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-4" *ngIf="addProductForm.get('digitalGoods').value !== true">
+                                                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                                                    <div><b>Ukuran Varian</b></div>
+                                                    <small> Ukuran dari varian produk setelah dikemas untuk menghitung volume </small>
+                                                </div>
+                                                <div class="col-12 col-md-9">
+                                                    <div class="d-flex" style="gap: 12px">
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <input class="form-control dk-text-input" formControlName="length" id="length-{{i}}" placeholder="1" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text dk-span-group" id="lengthUnit">cm</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-danger" *ngIf="variant.get('length').hasError('required') && (variant.get('length').dirty || variant.get('length').touched)">*This field is cannot be left empty</div>
+                                                            <div class="text-danger" *ngIf="variant.get('length').hasError('pattern')">*This field is not valid input text</div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <input class="form-control dk-text-input" formControlName="width" id="width-{{i}}" placeholder="1" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text dk-span-group" id="widthUnit">cm</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-danger" *ngIf="variant.get('width').hasError('required') && (variant.get('width').dirty || variant.get('width').touched)">*This field is cannot be left empty</div>
+                                                            <div class="text-danger" *ngIf="variant.get('width').hasError('pattern')">*This field is not valid input text</div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <input class="form-control dk-text-input" formControlName="height" id="height-{{i}}" placeholder="1" required type="text" pattern="^[0-9]*$" (keypress)="validationService.numberOnly($event)">
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text dk-span-group" id="heightUnit">cm</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-danger" *ngIf="variant.get('height').hasError('required') && (variant.get('height').dirty || variant.get('height').touched)">*This field is cannot be left empty</div>
+                                                            <div class="text-danger" *ngIf="variant.get('height').hasError('pattern')">*This field is not valid input text</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row p-3 my-2">
+                                <hr class="m-0" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                            <button (click)="changePage('list')" id="backButton" type="button" class="btn btn-secondary btn-block ml-auto">
+                                                <i class="fa fa-arrow-left in-icon"></i> BATAL
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="row">
+                                        <div class="col-12 col-md-8 mb-3 mb-md-0">
+<!--                                            <button (click)="submitAddProduct('add')" class="btn btn-secondary btn-block mr-3 mr-md-0" id="saveAndAddNew" type="submit" [disabled]="!addProductForm.valid" >-->
+<!--                                                SIMPAN DAN TAMBAH BARU-->
+<!--                                            </button>-->
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <button (click)="submitAddProduct('list')" class="btn btn-primary btn-block" id="save" type="submit" [disabled]="!addProductForm.valid" >SIMPAN</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </ng-container>
+
+</ng-template>

@@ -1,0 +1,144 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+        <!--Header-->
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Daftar Pesanan</h3>
+                <p>Kelola pesanan toko dan monitor status pesanan disini</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form (ngSubmit)="findTransaction()" [formGroup]="formGroupTransaction">
+                    <div class="d-md-flex row">
+                        <div  class="row col-md-9 col-12">
+                            <div  class="form-group col-md-6">
+                                <input type="text" class="form-control dk-text-input" placeholder="Cari nama pembeli, produk" id="searchInput"  formControlName="searchInput" type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@| ]*$">
+                                <i style="cursor: pointer;" class="fas fa-search field-icon" id="iconSearch" onclick=""></i>
+                                <div id="errorSearchFilterPattern" class="text-danger" *ngIf="formGroupTransaction.get('searchInput').hasError('pattern')">*This field is not valid input text</div>
+                            </div>
+                            
+                            <div class="form-group col-md-12">
+                                <div class="form-group">
+                                    <label class="font-weight-bold" for="">Status Pesanan</label>
+                                    <div>
+                                        <div class="form-check form-check-inline ">
+                                            <input class="form-check-input" type="checkbox" id="checkWaitingForPayment" formControlName="checkWaitingForPayment" [checked]="isCheckWaitingForPayment" value="menunggu_pembayaran">
+                                            <label class="form-check-label" for="checkWaitingForPayment">Menunggu Pembayaran</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" formControlName="checkNewOrder" id="checkNewOrder" [checked]="isCheckNewOrder"  value="Pesanan Baru">
+                                            <label class="form-check-label" for="checkNewOrder">Pesanan Baru</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" 
+                                            id="checkProccessed" [checked]="isCheckProccessed"  formControlName="checkProccessed" value="Diproses">
+                                            <label class="form-check-label" for="checkProccessed">Diproses</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="checkSent" [checked]="isCheckSent"  formControlName="checkSent" value="Dikirim">
+                                            <label class="form-check-label" for="checkSent">Dikirim</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="checkFinished" [checked]="isCheckFinished" formControlName="checkFinished" value="Selesai">
+                                            <label class="form-check-label" for="checkFinished">Selesai</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" [checked]="isCheckExpired" id="checkExpired" formControlName="checkExpired" value="Kadaluarsa">
+                                            <label class="form-check-label" for="checkExpired">Kadaluarsa</label>
+                                          </div>
+                                    </div>
+                                </div>
+                                  
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-inline-block">
+                            <div class="row  justify-content-md-end mx-md-0 mx-2">
+                                <button id="buttonClearFilterListPayment" class="btn btn-secondary mr-3" type="button" id="btnClearFilter" (click)="clearFilter()">CLEAR FILTER</button>
+                                <button 
+                                id="buttonFindTransactionPayment" class="btn btn-primary" type="button" id="btnFilter" type="submit" [disabled]="!formGroupTransaction.valid">SEARCH</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- List Transaction Data-->
+        <div class="card mt-3">
+            <div class="card-body">
+                <table class="table table-responsive-sm table-striped" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th scope="col">Nama Produk</th>
+                        <th scope="col">Halaman Pesanan</th>
+                        <th scope="col"></th>
+                        <th scope="col">Pembeli</th>
+                        <th scope="col">Total Bayar</th>
+                        <th scope="col">Pesanan Dibuat</th>
+                        <th scope="col">Status Pesanan</th>
+                    </tr>
+                    </thead>
+
+                    <tbody *ngIf="merchantOrderList?.orders?.length !== 0">
+                    <tr *ngFor="let order of merchantOrderList?.orders; let i = index">
+                        <td id="{{'name-' + i}}" class="align-middle"> <img class="image-container" [src]="order.products[0].image"> {{ order.products[0].name}}</td>
+                        <td id="{{'link-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable">{{ decodeURI(rootUrl + order.link) }}</td>
+                        <td id="{{'copy-' + i}}" class="align-middle"><i class="far fa-copy" style="cursor: pointer" (click)="copyMessage(decodeURI(rootUrl + order.link))"></i></td>
+                        <td id="{{'buyer-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable">{{ order.customer }}</td>
+                        <td id="{{'amount-' + i}}" class="align-middle">{{ order.price  | currency:'Rp ':'symbol-narrow':'1.0'}}</td>
+                        <td id="{{'createdDate-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable">{{ order.createdDate | date:'dd MMMM yyyy, HH:mm:ss z' }}</td>
+                        <td id="{{'status-' + i}}" class="align-middle">
+                            <span *ngIf="order.paymentStatus == paymentStatus.Unpaid" class="badge badge-warning"> Menunggu Pembayaran </span>
+                            <span *ngIf="order.paymentStatus == paymentStatus.Expired" class="badge badge-danger"> Kadaluarsa </span>
+                            <span *ngIf="order.status == orderStatus.Confirmed && order.paymentStatus == paymentStatus.Paid" class="badge badge-success"> Pesanan Baru </span>
+                            <span *ngIf="order.status == orderStatus.Processing && order.paymentStatus == paymentStatus.Paid" class="badge badge-warning"> Diproses </span>
+                            <span *ngIf="order.status == orderStatus.Sending && order.paymentStatus == paymentStatus.Paid" class="badge badge-warning"> Dikirim </span>
+                            <span *ngIf="order.status == orderStatus.Delivered && order.paymentStatus == paymentStatus.Paid" class="badge badge-warning"> Dikirim </span>
+                            <span *ngIf="order.status == orderStatus.Done && order.paymentStatus == paymentStatus.Paid" class="badge badge-secondary"> Selesai </span>
+                        </td>
+
+                    </tr>
+                    </tbody>
+
+                </table>
+
+                <div *ngIf="merchantOrderList.orders.length === 0" style="margin-top: 100px; margin-bottom: 100px">
+                    <div class="d-flex justify-content-center" style="margin-bottom: 20px">
+                        <i class="fas fa-search fa-8x"></i>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <h4>Maaf, belum ada pesanan</h4>
+                    </div>
+                    <div class="d-flex justify-content-center pt-2 text-muted">
+                        <span>Di halaman ini Anda dapat mengelola semua</span>
+                    </div>
+                    <div class="d-flex justify-content-center text-muted">
+                        <span>pesanan yang masuk. Ayo tetap semangat</span>
+                    </div>
+                    <div class="d-flex justify-content-center text-muted">
+                        <span>mendapatkan pesanan pertamamu!!</span>
+                    </div>
+                </div>
+
+                <div class="d-md-flex  bd-highlight mb-3">
+                    <select class="custom-select mr-auto bd-highlight align-middle" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="onPageChange(page,pageSize)">
+                        <option [ngValue]="5">5 items per page</option>
+                        <option [ngValue]="10">10 items per page</option>
+                        <option [ngValue]="15">15 items per page</option>
+                    </select>
+                    <p class="card-description p-2 bd-highlight align-middle">Showing {{merchantOrderList.pageable.startData}} to {{merchantOrderList.pageable.endData}} from {{merchantOrderList.pageable.totalData}} entries</p>
+                    <ngb-pagination class="p-2 bd-highlight align-middle" [(page)]="page" [pageSize]="pageSize" [collectionSize]="merchantOrderList.pageable.totalData" (pageChange)="onPageChange($event,pageSize)" [maxSize]="2"></ngb-pagination>
+                </div>
+
+            </div>
+        </div>
+
+</ng-template>

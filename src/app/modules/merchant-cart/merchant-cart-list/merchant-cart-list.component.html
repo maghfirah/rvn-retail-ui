@@ -1,0 +1,131 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded">
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- Customer Facing Cart List -->
+    <ng-container *ngIf="pageName === 'merchant-cart-list'">
+        <div class="max-screen-sm mx-auto">
+            <!--Page header -->
+            <div class="pt-3">
+                <div class="col-12 text-center">
+                    <button class="btn float-left pt-1" (click)="btnBack()" id="backButton" type="button">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-center" style="font-size: 16px; font-weight: bold">Keranjang</span>
+                    <button class="btn float-right pt-1" (click)="btnMerchantProduct()" id="cartButton"
+                            type="button">
+                        <i class="fas fa-store"></i>
+                    </button>
+                    <hr>
+                </div>
+            </div>
+            <!--End Page header -->
+
+            <div class="row px-3" style="flex: 1 0 auto">
+                <div class="col">
+                    <div style="padding-bottom: 100px">
+                        <div *ngFor="let cartItem of cart.cartItems; let i = index">
+                            <div *ngFor="let item of cartItem.items; let i2 = index">
+                                <div class="row">
+                                    <div class="col-3 mb-auto mt-auto">
+                                        <img [src]="cartItem.product.image" style="height: 95%; width: 95%;"
+                                             alt=""/>
+                                    </div>
+                                    <div class="col-9 mb-auto mt-auto">
+                                        <div class="row">
+                                            <div class="col pl-2">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <h4>{{cartItem.product.name}}</h4>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <span>{{item.color}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <span>{{item.price | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-end mb-auto mt-3">
+                                                    <div class="col d-flex qty">
+                                                        <button [disabled]="item.quantity <= item.minimumOrder" class=" plus"
+                                                                (click)="updateCartProduct(i,i2, item.uiId,item.quantity - 1)">
+                                                            <span class="fas fa-minus"></span></button>
+                                                        <input (change)="onChangeQuantiy($event, i,i2, item.uiId)"
+                                                               type="number" class="count" [value]="item.quantity"/>
+                                                        <button [disabled]="item.quantity >= item.stock" class=" minus"
+                                                                (click)="updateCartProduct(i,i2, item.uiId,item.quantity + 1)">
+                                                            <span class="fas fa-plus"></span></button>
+                                                    </div>
+                                                    <div class="col">
+                                                        <a class="btn p-0 float-right"
+                                                           (click)="deleteCartProduct(item.uiId, i, i2)">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4" *ngIf="totalProduct">
+                        <div class="col">
+                            <div class="bottom-card">
+                                <div class="row px-3">
+                                    <div class="col">
+                                        <span class="text-muted">Sub Total</span>
+                                    </div>
+                                    <div class="col">
+                                        <h4 class="text-right">{{cart.totalPrice | currency:'Rp ':'symbol-narrow':'1.0'}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row px-3">
+                                    <div class="col-12 mt-3">
+                                        <div>
+                                            <div class="w-100">
+                                                <div class="responsive-layout--button-action justify-content-end w-100">
+                                                    <button (click)="btnCheckoutCart()"
+                                                            [disabled]="hasDigitalAndNonDigitalGoods"
+                                                            style="width: 100%" class="btn btn-primary mb-3"
+                                                            id="addChart" type="button">
+                                                        Checkout
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--If empty cart -->
+                    <div class="justify-content-center center" *ngIf="!totalProduct">
+                        <h4 class="mb-3">Keranjang belanjamu kosong</h4>
+
+                        <div class="col-12 text-center">
+                            <button type="button" (click)="btnMerchantProduct()" class="btn btn-primary">Lanjut
+                                Belanja
+                            </button>
+                        </div>
+                    </div>
+                    <!--End empty cart -->
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <!-- Customer Facing Cart List-->
+</ng-template>

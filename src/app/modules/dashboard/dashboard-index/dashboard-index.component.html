@@ -1,0 +1,178 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<ng-template #loaded>
+    <!-- Add Inventory-->
+    <ng-container *ngIf="pageName === 'dashboard'">
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Toko Saya</h3>
+                <p>Berikut ringkasan informasi yang terjadi di tokomu.</p>
+            </div>
+        </div>
+
+        <div class="card mb-5">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h4>Ringkasan Transaksi</h4>
+                        <p>Hal yang perlu kamu tanggapi hari ini</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md col-sm-12 summary-transaction summary-border">
+                        <div class="card">
+                            <a (click)="goToTransactionPage(transactionStatus.checkWaitingForPayment)">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <h3>{{dashboardData?.transaction_status?.waiting_for_payment_count}}</h3>
+                                            <p>Pesanan baru</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-transaction summary-border">
+                        <div class="card">
+                            <a (click)="goToTransactionPage(transactionStatus.checkNewOrder)">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <h3>{{dashboardData?.transaction_status?.new_order_count}}</h3>
+                                            <p>Pesanan perlu di proses</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-transaction summary-border">
+                        <div class="card">
+                            <a (click)="goToTransactionPage(transactionStatus.checkProccessed)">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <h3>{{dashboardData?.transaction_status?.processing_count}}</h3>
+                                            <p>Siap dikirim</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-transaction summary-border">
+                        <div class="card">
+                            <a (click)="goToTransactionPage(transactionStatus.checkSent)">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <h3>{{dashboardData?.transaction_status?.sending_count}}</h3>
+                                            <p>Dalam pengiriman</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-transaction">
+                        <div class="card">
+                            <a (click)="goToTransactionPage(transactionStatus.checkFinished)">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <h3>{{dashboardData?.transaction_status?.done_count}}</h3>
+                                            <p>Sampai ditujuan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-5">
+            <div class="card-body">
+                <div class="row mb-3" style="align-items: center">
+                    <div class="col-md-auto col">
+                        <h4>Status Produk</h4>
+                    </div>
+                    <div class="col-md-auto col">
+                        <button (click)="changePage('add')" class="btn btn-outline-danger"><span class="fas fa-plus"></span>Tambah Produk</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md col-sm-12 summary-product summary-border">
+                        <div class="card">
+                            <a (click)="goToOrderPage()">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <p>Total produk aktif</p>
+                                            <h3>{{dashboardData?.product_status?.approved_count}}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-product summary-border">
+                        <div class="card">
+                            <a (click)="goToOrderPage()">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <p>Produk dalam verifikasi</p>
+                                            <h3>{{dashboardData?.product_status?.waiting_count}}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md col-sm-12 summary-product summary-border">
+                        <div class="card">
+                            <a (click)="goToOrderPage()">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <p>Produk di tolak</p>
+                                            <h3>{{dashboardData?.product_status?.rejected_count}}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md col-sm-12 summary-product">
+                        <div class="card">
+                            <a (click)="goToOrderPage()">
+                                <div class="card-body">
+                                    <div class="row m-0">
+                                        <div class="col">
+                                            <p>Produk habis</p>
+                                            <h3>1</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Add Inventory-->
+<!--    <ng-container *ngIf="pageName === 'add'">-->
+<!--        <app-inventory-add ></app-inventory-add>-->
+<!--    </ng-container>-->
+</ng-template>

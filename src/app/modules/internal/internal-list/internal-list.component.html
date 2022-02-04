@@ -1,0 +1,158 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- List Inventory -->
+    <ng-container *ngIf="pageName === 'list'">
+
+        <!--Header-->
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Daftar Produk</h3>
+                <p>List daftar produk Merchant</p>
+            </div>
+        </div>
+
+        <!-- Internal List Inventory Data-->
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Filter Row -->
+                <div class="row">
+                    <div class="form-group col-md-3 page-header">
+                        <div class="row">
+                            <div class="col">
+                                <span class="font-weight-bold">Nama Produk</span>
+                                <br>
+                                <input class="form-control dk-text-input mt-2" id="productName" placeholder="Cari nama produk" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" [(ngModel)]="filterProductName">
+                            </div>
+                        </div>
+                    </div>
+<!--                    <div class="form-group col-md-3 page-header">-->
+<!--                        <div class="row">-->
+<!--                            <div class="col">-->
+<!--                                <span>Nama Produk</span>-->
+<!--                                <br>-->
+<!--                                <input class="form-control dk-text-input mt-2" id="name" placeholder="Store Name" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" >-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-3 page-header">-->
+<!--                        <div class="row">-->
+<!--                            <div class="col">-->
+<!--                                <span>Nama Produk</span>-->
+<!--                                <br>-->
+<!--                                <input class="form-control dk-text-input mt-2" id="name" placeholder="Store Name" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" >-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="form-group col-md-9 page-header d-flex justify-content-end">
+                        <div class="row">
+                            <div class="col">
+                                <br>
+                                <div class="row">
+                                    <div class="col">
+<!--                                        <button class="btn btn-link" type="button" id="submitEmail2">LEBIH BANYAK</button>-->
+                                    </div>
+                                    <div class="col">
+                                        <button class="btn btn-primary" type="button" id="btnProduct" (click)="findProduct()">CARI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <span class="font-weight-bold">Status</span>
+                        <br>
+                        <div class="form-check form-check-inline mt-2">
+                            <input class="form-check-input" type="checkbox" id="waiting" [(ngModel)]="filterChkWaiting">
+                            <label class="form-check-label" for="waiting">{{productStatusEnum.WAITING}}</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="active" [(ngModel)]="filterChkActive">
+                            <label class="form-check-label" for="active">{{productStatusEnum.ACTIVE}}</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="nonactive" [(ngModel)]="filterChkNonActive">
+                            <label class="form-check-label" for="nonactive">{{productStatusEnum.NON_ACTIVE}}</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="reject" [(ngModel)]="filterChkRejected">
+                            <label class="form-check-label" for="reject">{{productStatusEnum.REJECTED}}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <table class="table table-responsive-sm table-striped" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th scope="col">Nama</th>
+                        <th scope="col" style="width: 180px">Harga(Rp)</th>
+                        <th scope="col" style="width: 100px">Stock</th>
+                        <th scope="col">Tautan</th>
+                        <th scope="col" style="width: 60px"></th>
+                        <th scope="col">Nama Toko</th>
+                        <th scope="col" style="width: 150px">Status</th>
+                    </tr>
+                    </thead>
+
+                    <tbody *ngIf="productList.length !== 0">
+                    <tr *ngFor="let inventory of productList; let i = index">
+                        <td id="{{'name-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable"> <img class="image-container" [src]="inventory.images[0]?.url"> {{ inventory.name}}</td>
+                        <td id="{{'price-' + i}}" class="align-middle">{{ inventory.price | currency:'Rp ':'symbol-narrow':'1.0'}}</td>
+                        <td id="{{'stock-' + i}}" class="align-middle">{{ inventory.stock }}</td>
+                        <td id="{{'link-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable">{{ productLinkRoot + decodeURI(inventory.merchant.link + '/' + inventory.link) }}</td>
+                        <td id="{{'copy-' + i}}" class="align-middle"><i class="far fa-copy" style="cursor: pointer" (click)="copyMessage(productLinkRoot + decodeURI(inventory.merchant.link + '/' + inventory.link))"></i></td>
+                        <td id="{{'merchantName-' + i}}" class="align-middle">{{inventory.merchant.businessServiceClientName}}</td>
+                        <td id="{{'status-' + i}}" class="align-middle">
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.APPROVED" class="badge badge-success"> {{productStatusEnum.ACTIVE}} </span>
+                            <span *ngIf="inventory.active == false && productStatusEnum[inventory.status] == productStatusEnum.APPROVED" class="badge badge-secondary"> {{productStatusEnum.NON_ACTIVE}} </span>
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.WAITING" class="badge badge-warning pointer-cursor" (click)="changePage('edit', inventory.uiId)"> {{productStatusEnum.WAITING}} </span>
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.REJECTED" class="badge badge-danger"> {{productStatusEnum.REJECTED}} </span>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+
+                <div *ngIf="productList.length === 0" style="margin-top: 100px; margin-bottom: 100px">
+                    <div class="d-flex justify-content-center" style="margin-bottom: 20px">
+                        <i class="fas fa-search fa-8x"></i>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <h4>Maaf, belum ada Produk</h4>
+                    </div>
+                </div>
+
+                <div class="d-flex bd-highlight mb-3">
+                    <select class="custom-select mr-auto bd-highlight align-middle" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="onPageChange(page,pageSize)">
+                        <option [ngValue]="5">5 items per page</option>
+                        <option [ngValue]="10">10 items per page</option>
+                        <option [ngValue]="15">15 items per page</option>
+                    </select>
+                    <p class="card-description p-2 bd-highlight align-middle">Showing {{startData}} to {{endData}} from {{totalData}} entries</p>
+                    <ngb-pagination class="p-2 bd-highlight align-middle" [(page)]="page" [pageSize]="pageSize" [collectionSize]="totalData" (pageChange)="onPageChange($event,pageSize)" [maxSize]="2"></ngb-pagination>
+                </div>
+
+            </div>
+        </div>
+
+    </ng-container>
+
+    <!-- Detail/Edit Inventory-->
+    <ng-container *ngIf="pageName === 'edit'">
+        <app-internal-detail [productUiId]='productUiId'></app-internal-detail>
+    </ng-container>
+
+</ng-template>

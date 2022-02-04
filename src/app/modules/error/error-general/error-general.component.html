@@ -1,0 +1,105 @@
+<!-- Unauthorized Error -->
+<ng-container *ngIf="httpStatus == unauthorizedCode; else notFound">
+  <div class="container h-100">
+    <div class="error-holder d-flex align-content-end">
+      <div class="error__wrapper d-flex">
+        <div class="d-flex error__wrapper ">
+          <div class="error__text">
+            <div class="error-img-small" style="display: none;">
+              <img src="./assets/images/401.png" alt="">
+            </div>
+            <div class="error-title">
+              <h1 class="font-weight-bold">Authorization required</h1>
+            </div>
+            <div class="error-content">
+              <p>
+                <b>You seems like need authorization to access this page. Let us know if you need something immediately.</b>
+              </p>
+              <p class="error-code">Error code: 401</p>
+            </div>
+<!--            <div class="action-button">-->
+<!--              <button type="button" class="btn btn-primary">-->
+<!--                <i class="fa fa-phone in-icon" style="transform: scaleX(-1);"></i> CALL US-->
+<!--              </button>-->
+<!--            </div>-->
+          </div>
+        </div>
+      </div>
+      <div class="error__aside d-flex">
+        <img src="./assets/images/401.png" alt="">
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Not Found Error -->
+<ng-template #notFound>
+  <ng-container *ngIf="httpStatus == notFoundCode; else defaultError">
+    <div class="container h-100">
+      <div class="error-holder d-flex align-content-end">
+        <div class="error__wrapper d-flex">
+          <div class="d-flex error__wrapper ">
+            <div class="error__text">
+              <div class="error-img-small" style="display: none;">
+                <img src="./assets/images/404.png" alt="">
+              </div>
+              <div class="error-title">
+                <h1 class="font-weight-bold">Couldn't find anything</h1>
+              </div>
+              <div class="error-content">
+                <p>
+                  <b>Sorry, the page you were looking for could not be found. Unfortunately you’ve got “Alamat Palsu”.</b>
+                </p>
+                <p class="error-code">Error code: 404</p>
+              </div>
+              <div class="action-button">
+                <button type="button" class="btn btn-primary" (click)="goBack()">
+                  <i class="fa fa-arrow-left"></i> GO BACK HOME
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="error__aside d-flex">
+          <img src="./assets/images/404.png" alt="">
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>
+
+<!-- Default Error -->
+<ng-template #defaultError>
+  <div class="container h-100">
+    <div class="error-holder d-flex align-content-end">
+      <div class="error__wrapper d-flex">
+        <div class="d-flex error__wrapper ">
+          <div class="error__text">
+            <div class="error-img-small" style="display: none;">
+              <img src="./assets/images/500.png" alt="">
+            </div>
+            <div class="error-title">
+              <h1 class="font-weight-bold">Wait...what?</h1>
+              <h2 class="font-weight-bold">Hmm, this is unexpected</h2>
+            </div>
+            <div class="error-content">
+              <p>
+                <b>We're working to fix the problem! We'll be back shortly. Let us know if you need something immediately.</b>
+              </p>
+              <p class="error-code">Error code: {{errorCode}}</p>
+              <p *ngIf="errorMessage !== undefined" class="error-message">Error message: {{errorMessage}}</p>
+            </div>
+<!--            <div class="action-button">-->
+<!--              <button type="button" class="btn btn-primary">-->
+<!--                <i class="fa fa-phone in-icon" style="transform: scaleX(-1);"></i> CALL US-->
+<!--              </button>-->
+<!--            </div>-->
+          </div>
+        </div>
+      </div>
+      <div class="error__aside d-flex">
+        <img src="./assets/images/500.png" alt="">
+      </div>
+    </div>
+  </div>
+</ng-template>

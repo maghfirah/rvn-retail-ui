@@ -1,0 +1,284 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded">
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+    <!-- Customer Facing Merchant Product-->
+    <ng-container *ngIf="pageName === 'merchant-product'">
+        <div class="max-screen-sm mx-auto">
+            <!--Page header -->
+            <div class="row pt-3">
+                <div class="col-10 text-center">
+                    <button class="btn float-left pt-1" (click)="btnMerchantProduct()" id="backButton" type="button">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-center" style="font-size: 16px; font-weight: bold">{{ (productDetail?.merchant?.name.length>50)? (productDetail?.merchant?.name | slice:0:50)+'..':(productDetail?.merchant?.name) }}</span>
+                </div>
+                <div class="cart-button col-2 text-center">
+                    <a class="btn btn-link text-dark p-1" style="font-size: larger" (click)="toggleBtmSheetShareTo()">
+                        <i class="fas fa-share-alt"></i>
+                    </a>
+                    <a class="btn btn-link text-dark p-1" style="font-size: larger" (click)="btnCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+            </div>
+            <hr>
+            <!--End Page header -->
+
+            <ngb-carousel  #productCarousel  class="carousel-product" [interval]="0" *ngIf="productDetail?.images.length" [showNavigationArrows]="productDetail?.images.length > 1" [showNavigationIndicators]="productDetail?.images.length > 1">
+                <ng-template ngbSlide *ngFor="let image of productDetail?.images; let i = index" id="ngb-slide-{{i}}">
+                    <div (mousedown)="mouseMove($event, 'start')" (touchstart)="swipe($event, 'start')" (touchend)="swipe($event, 'end')" (mousemove)="mouseMove($event, 'end')" class="picsum-img-wrapper">
+                        <img style="user-select: none; -webkit-user-drag: none;" [src]="image.url" class="prod-img" alt="">
+                    </div>
+                </ng-template>
+            </ngb-carousel>
+
+            <div class="row">
+                <div class="col-2 m-1" *ngFor="let image of productDetail?.images; let i = index ">
+                    <img (click)="productCarousel.select('ngb-slide-'+i)" [src]="image.url" class="img-thumbnail img-responsive" alt="product" style="cursor: pointer">
+                </div>
+            </div>
+
+            <div class="row p-3">
+                <div class="col">
+                    <div id="stock" class="align-middle mb-3">
+                        <span *ngIf="[activeVariant?.stock] >= 1" class="badge badge-success"> Stok Tersedia </span>
+                        <span *ngIf="[activeVariant?.stock] < 1" class="badge badge-secondary"> Stok Kosong </span>
+                    </div>
+
+                    <h4>{{productDetail?.name}}</h4>
+
+                    <h2 *ngIf="[activeVariant?.stock] >= 1"
+                        class="text-success"> {{activeVariant?.price | currency:'Rp ':'symbol-narrow':'1.0'}} </h2>
+                    <h2 *ngIf="[activeVariant?.stock] < 1"
+                        class="text-secondary"> {{activeVariant?.price | currency:'Rp ':'symbol-narrow':'1.0'}} </h2>
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row px-3">
+                <div class="col">
+                    <h4>Detail Produk</h4>
+                    <div class="row form-group mb-3">
+                        <span class="col-12 col-md-3 text-muted mb-auto mt-auto">Varian</span>
+                        <div class="col-12 col-md-9">
+                            <ng-select [clearable]="false" [multiple]="false" id="category"
+                                       [(ngModel)]="variantColor" (change)="changeVariant()">
+                                <ng-option *ngFor="let variant of productDetail.variants"
+                                           [value]="variant.color">{{variant.color}}
+                                </ng-option>
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <span class="col-6 col-md-3 text-muted">Stock</span>
+                        <h4 class="col-6 col-md-9">{{activeVariant?.stock}}</h4>
+                    </div>
+                    <div class="row mb-1">
+                        <span class="col-6 col-md-3 text-muted">Kategori</span>
+                        <h4 class="col-6 col-md-9">{{productDetail?.category}}</h4>
+                    </div>
+
+                    <!-- Hide if Category is Digital Goods -->
+                    <div class="row mb-1" *ngIf="productDetail?.variants[0].digitalGoods !== true">
+                        <span class="col-6 col-md-3 text-muted">Berat</span>
+                        <div class="col-6 col-md-9">
+                            <h4 class="d-inline-block mr-2">{{activeVariant?.weight}}</h4>
+                            <span>kg</span>
+                        </div>
+                    </div>
+
+                    <!-- Hide if Category is Digital Goods -->
+                    <div class="row mb-1" *ngIf="productDetail?.variants[0].digitalGoods !== true">
+                        <span class="col-6 col-md-3 text-muted">Panjang</span>
+                        <div class="col-6 col-md-9">
+                            <h4 class="d-inline-block mr-2">{{activeVariant?.length}}</h4>
+                            <span>cm</span>
+                        </div>
+                    </div>
+
+                    <!-- Hide if Category is Digital Goods -->
+                    <div class="row mb-1" *ngIf="productDetail?.variants[0].digitalGoods !== true">
+                        <span class="col-6 col-md-3 text-muted">Tinggi</span>
+                        <div class="col-6 col-md-9">
+                            <h4 class="d-inline-block mr-2">{{activeVariant?.height}}</h4>
+                            <span>cm</span>
+                        </div>
+                    </div>
+
+                    <!-- Hide if Category is Digital Goods -->
+                    <div class="row mb-1" *ngIf="productDetail?.variants[0].digitalGoods !== true">
+                        <span class="col-6 col-md-3 text-muted">Lebar</span>
+                        <div class="col-6 col-md-9">
+                            <h4 class="d-inline-block mr-2">{{activeVariant?.width}}</h4>
+                            <span>cm</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <span class="col-6 col-md-3 text-muted">Kondisi</span>
+                        <h4 class="col-6 col-md-9">{{productDetail?.condition}}</h4>
+                    </div>
+
+                    <div class="row mb-1">
+                        <span class="col-6 col-md-3 text-muted">Dikirim Dari</span>
+                        <h4 class="col-6 col-md-9">{{productDetail?.merchant?.city?.name | titlecase}}</h4>
+                    </div>
+                    <hr>
+                    <div class="row my-3">
+                        <p class="col">{{productDetail?.description}}</p>
+                    </div>
+                    <hr>
+                    <div *ngIf="productList?.length !== 0 ">
+                        <div class="row">
+                            <h4>Produk Lainnya</h4>
+                        </div>
+                        <div #scrollDrag [hidden]="loadingProduct" 
+                        
+                        class="span1 mt-4" style="overflow: auto" #elemt (mousedown)="startDragging($event, false, elemt)" (mouseup)="stopDragging($event, false)"
+                        (close)="cek($event)"
+                        (mouseleave)="stopDragging($event, false)" (mousemove)="moveEvent($event, elemt)">
+                            <div class="row-fluid" >
+                                <div *ngFor="let product of productList; let i = index"  class="product-catalog" style="cursor: pointer;"  (click)="toDetailClick($event, product.link, i)" >
+                                    <img class="product-image" src="{{product?.images[0].url}}" alt="" id="productImage-{{i}}"/>
+                                    <div class="single-product-name  mt-2"  id="productName-{{i}}">
+                                        {{product.name}}
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between align-items-center">
+                                        <div class="single-product-price" id="productPrice-{{i}}">{{convertPriceValue(product.variants[0].price)}}</div>
+                                        <div class="pr-2 text-secondary" style="float: right" id="soldProduct-{{i}}">{{product?.soldProduct}} terjual</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div [hidden]="!loadingProduct"  class="row">
+                        <div  class="span1 mt-2" style="overflow: auto">
+                            <div class="row-fluid">
+                                <div *ngFor="let product of productList; let i = index"  class="product-catalog">
+                                    <img class="product-image-loading" alt="" id="productImage-{{i}}"/>
+                                    <div class="single-product-name-loading  mt-2"  id="productName-{{i}}">
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between align-items-center">
+                                        <div class="single-product-price-loading" id="productPrice-{{i}}"></div>
+                                        <div class="pr-2 single-product-terjual-loading" style="float: right" id="soldProduct-{{i}}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form [formGroup]="addChartProduct" id="addPhoneNumber">
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="bottom-card">
+                                    <div class="row px-3">
+                                        <div class="col-5 mb-auto mt-auto pl-0">
+                                            <h4 class="">Jumlah</h4>
+                                            <input class="col-8 quantityFont" formControlName="quantity" type="text"
+                                                   pattern="^[0-9]*$"
+                                                   (keypress)="validationService.numberOnly($event)"/>
+
+                                            <p class="col text-danger"
+                                               *ngIf="addChartProduct.get('quantity').hasError('required') && (addChartProduct.get('quantity').dirty || addChartProduct.get('quantity').touched)">
+                                                *This field is cannot be left empty</p>
+                                            <p class="col text-danger"
+                                               *ngIf="addChartProduct.get('quantity').hasError('pattern')">*This field
+                                                is not valid input text</p>
+                                            <p class="col text-danger"
+                                               *ngIf="addChartProduct.get('quantity').hasError('min')">*This field min
+                                                input {{activeVariant.minimumOrder}}</p>
+                                            <p class="col text-danger"
+                                               *ngIf="addChartProduct.get('quantity').hasError('max')">*This field max
+                                                input {{activeVariant.stock}}</p>
+                                        </div>
+                                        <div class="col-7 mb-auto mt-auto pr-0">
+                                            <div class="row d-flex justify-content-end">
+                                                <h4>Total Harga</h4>
+                                            </div>
+                                            <div class="row d-flex justify-content-end">
+                                                <h3 class="text-primary">{{addChartProduct.get('quantity').value *
+                                                    activeVariant.price | currency:'Rp ':'symbol-narrow':'1.0'}}</h3>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-12 mt-3">
+                                            <div>
+                                                <div class="w-100">
+                                                    <div class="responsive-layout--button-action justify-content-end w-100">
+                                                        <button style="width: 100%" (click)="submitCheckout()"
+                                                                class="btn btn-primary"
+                                                                id="saveAndAddNew" type="button"
+                                                                [disabled]="!addChartProduct.valid || activeVariant.digitalGoods !== isDigitalGoods || (itemInCart >= limitCart && !cartHasVariant)">
+                                                            BELI SEKARANG <span *ngIf="currentVariantInCart">(<span class="fas fa-cart-plus"></span> {{currentVariantInCart}})</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!--Modal bottom sheet share to-->
+            <div
+                    class="bottom-sheet"
+                    *ngIf="showBottomSheetShareTo"
+                    id="buttomSheet"
+                    #bottomSheet>
+                <div class="backdrop" (click)="toggleBtmSheetShareTo()"></div>
+                <div class="bottom-sheet-container"
+                        [ngClass]="showBottomSheetShareTo ? 'slideTop' : 'slideDown'">
+                    <div class="sheet-line"></div>
+                    <div class="sheet-container">
+                        <h4>Share produk ini</h4>
+                        <div class="row mt-4">
+                            <h6>{{productDetail?.name}}</h6>
+                            <div class="col-12">
+                                <div class="input-group" id="btnGroupCopyLink">
+                                    <input type="text" class="form-control" placeholder="{{productLinkRoot}}" disabled>
+                                    <div class="input-group-text" (click)="copyMessage(productLinkRoot + decodeURI(productDetail?.link))">
+                                        <i class="fas fa-link" style="cursor: pointer"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col text-center">
+                                <a (click)="onClickShareTo('whatsapp')" class="btnShareTo facebook">
+                                    <span class="fab fa-whatsapp-square fa-3x"></span>
+                                </a>
+                            </div>
+                            <div class="col text-center">
+                                <a (click)="onClickShareTo('facebook')" class="btnShareTo facebook">
+                                    <span class="fab fa-facebook-square fa-3x"></span>
+                                </a>
+                            </div>
+                            <div class="col text-center">
+                                <a (click)="onClickShareTo('instagram')" class="btnShareTo facebook">
+                                    <span class="fab fa-instagram-square fa-3x"></span>
+                                </a>
+                            </div>
+                            <div class="col text-center">
+                                <a (click)="onClickShareTo('line')" class="btnShareTo facebook">
+                                    <span class="fab fa-line fa-3x"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+</ng-template>

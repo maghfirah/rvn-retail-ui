@@ -1,0 +1,44 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+    <div class="card">
+        <div class="card-body">
+
+            <!--Header-->
+            <div class="row">
+                <div class="form-group col-md-12 page-header">
+                    <h3>Simulator Receive Order</h3>
+                    <p>Simulator untuk melakukan pesanan telah diterima</p>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <form (ngSubmit)="submitReceiveOrder()" [formGroup]="receiveOrderForm" id="receiveOrderForm">
+                <div class="row">
+                    <div class="form-group col-md-3 page-header">
+                        <div class="row">
+                            <div class="col">
+                                <span class="font-weight-bold">Nomor Pesanan</span>
+                                <br>
+                                <input class="form-control dk-text-input mt-2" id="nomorPesanan" placeholder="INV-RETAIL-12345678901234567" formControlName="nomorPesanan" required type="text" pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| -]*$" >
+                                <div class="text-danger" *ngIf="receiveOrderForm.get('nomorPesanan').hasError('pattern')">*This field is not valid input text</div>
+                                <div class="text-danger" *ngIf="receiveOrderForm.get('nomorPesanan').hasError('required') && (receiveOrderForm.get('nomorPesanan').dirty || receiveOrderForm.get('nomorPesanan').touched)">*This field is cannot be left empty</div>
+                                <br>
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-primary" type="submit" id="btnSubmitOrderReceive" [disabled]="!receiveOrderForm.valid">SUBMIT</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>

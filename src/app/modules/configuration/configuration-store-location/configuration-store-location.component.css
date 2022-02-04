@@ -1,0 +1,36 @@
+/* css for loading page */
+.center {
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* css for image container page */
+img.image-container {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+}
+
+/* layouting for pilih foto dan gambar foto */
+.responsive-layout {
+    display: flex;
+    justify-content: flex-end;
+}
+.responsive-layout .form-group:first-child, .responsive-layout{
+    margin-right: 16px;
+}
+@media (max-width: 768px) {
+    .responsive-layout {
+        display: block;
+    }
+    .responsive-layout .form-group, .responsive-layout .form-group {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+}

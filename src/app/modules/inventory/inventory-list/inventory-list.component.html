@@ -1,0 +1,200 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded" >
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- List Inventory -->
+    <ng-container *ngIf="pageName === 'list'">
+
+        <!--Header-->
+        <div class="row">
+            <div class="form-group col-md-12 page-header">
+                <h3>Daftar Produk</h3>
+                <p>Atur dan kelola produk disini</p>
+            </div>
+        </div>
+
+        <div class="card card-body mb-4">
+            <div class="form-group row mr-1 ml-1">
+                <div style="width: 30%">
+                    <input type="text" class="form-control dk-text-input" placeholder="Cari nama produk" id="inputSearch" [(ngModel)]="inputSearchProduct">
+                    <i class="fas fa-search field-icon pointer-cursor" style="" id="iconSearch" (click)="findProductMerchant()"></i>
+                </div>
+                <div class="d-flex ml-auto">
+                    <button type="submit" class="btn btn-primary" (click)="changePage('add', null)">Tambah Produk <i class="fa fa-plus in-icon"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- List Inventory Data-->
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-responsive-sm table-striped" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th scope="col">Nama</th>
+                        <th scope="col">Harga(Rp)</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Tautan</th>
+                        <th scope="col"></th>
+                        <th scope="col">Status</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody *ngIf="productList.length !== 0">
+                    <tr *ngFor="let inventory of productList; let i = index">
+                        <td id="{{'name-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable"> <img class="image-container" [src]="inventory.images[0]?.url"> {{ inventory.name}}</td>
+                        <td id="{{'price-' + i}}" class="align-middle">{{ inventory.price | currency:'Rp ':'symbol-narrow':'1.0'}}</td>
+                        <td id="{{'stock-' + i}}" class="align-middle">{{ inventory.stock }}</td>
+                        <td id="{{'link-' + i}}" class="align-middle text-ellipsis text-ellipsis-breakable">{{ productLinkRoot + decodeURI(inventory.link) }}</td>
+                        <td id="{{'copy-' + i}}" class="align-middle"><i class="far fa-copy" style="cursor: pointer" (click)="copyMessage(productLinkRoot + decodeURI(inventory.link))"></i></td>
+                        <td id="{{'status-' + i}}" class="align-middle">
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.APPROVED" class="badge badge-success"> {{productStatusEnum.ACTIVE}} </span>
+                            <span *ngIf="inventory.active == false && productStatusEnum[inventory.status] == productStatusEnum.APPROVED" class="badge badge-secondary"> {{productStatusEnum.NON_ACTIVE}} </span>
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.WAITING" class="badge badge-warning"> {{productStatusEnum.WAITING}} </span>
+                            <span *ngIf="inventory.active == true && productStatusEnum[inventory.status] == productStatusEnum.REJECTED" class="badge badge-danger"> {{productStatusEnum.REJECTED}} </span>
+                        </td>
+                        <td id="{{'action-' + i}}">
+                            <div ngbDropdown class="d-inline-block">
+                                <button class="btn btn-outline-primary dropdown-icon" id="dropdownAction" ngbDropdownToggle><i class="fa fa-ellipsis-v"></i></button>
+                                <div ngbDropdownMenu aria-labelledby="dropdownAction">
+                                    <button ngbDropdownItem (click)="changePage('edit', inventory.uiId)">Lihat Detail</button>
+                                    <button *ngIf="inventory.active == true && (productStatusEnum[inventory.status] === productStatusEnum.APPROVED)" ngbDropdownItem (click)="openModalStatusProduct(disableProduct, inventory.uiId)">Nonaktifkan Produk</button>
+                                    <button *ngIf="inventory.active == false && (productStatusEnum[inventory.status] === productStatusEnum.APPROVED)" ngbDropdownItem (click)="openModalStatusProduct(enableProduct, inventory.uiId)">Aktifkan Produk</button>
+<!--                                    <button ngbDropdownItem disabled="true">Bagikan</button>-->
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+
+                </table>
+
+                <div *ngIf="productList.length === 0" style="margin-top: 100px; margin-bottom: 100px">
+                        <div class="d-flex justify-content-center" style="margin-bottom: 20px">
+                            <i class="fas fa-search fa-8x"></i>
+                        </div>
+                    <div class="d-flex justify-content-center">
+                        <h4>Maaf, belum ada Produk</h4>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <span>Klik button TAMBAH PRODUK untuk</span>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <span>menambah produk pertamamu</span>
+                    </div>
+                </div>
+
+                <div class="d-flex bd-highlight mb-3">
+                    <select class="custom-select mr-auto bd-highlight align-middle" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="onPageChange(page,pageSize)">
+                        <option [ngValue]="5">5 items per page</option>
+                        <option [ngValue]="10">10 items per page</option>
+                        <option [ngValue]="15">15 items per page</option>
+                    </select>
+                    <p class="card-description p-2 bd-highlight align-middle">Showing {{startData}} to {{endData}} from {{totalData}} entries</p>
+                    <ngb-pagination class="p-2 bd-highlight align-middle" [(page)]="page" [pageSize]="pageSize" [collectionSize]="totalData" (pageChange)="onPageChange($event,pageSize)" [maxSize]="2"></ngb-pagination>
+                </div>
+
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Add Inventory-->
+    <ng-container *ngIf="pageName === 'add'">
+        <app-inventory-add ></app-inventory-add>
+    </ng-container>
+
+    <!-- Detail/Edit Inventory-->
+    <ng-container *ngIf="pageName === 'edit'">
+        <app-inventory-edit [productUiId]='productUiId'></app-inventory-edit>
+    </ng-container>
+
+</ng-template>
+
+<!--Modal Nonaktifkan Produk-->
+<ng-template #disableProduct let-modal let-c="close">
+
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <div class="event-icon d-flex">
+                <div>
+                    <img src="https://cdn-dev.oss-ap-southeast-5.aliyuncs.com/doku-ui-framework/doku/img/modal-ornament/warning-icon.png"
+                            alt="">
+                </div>
+                <div class="header-content">
+                    <h4>Nonaktifkan Produk?</h4>
+                </div>
+            </div>
+        </h5>
+
+    </div>
+    <div class="modal-body">
+        <div class="background">
+            Produk akan dinonaktifkan dan tidak akan tertampil pada website pelanggan Anda.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-link" (click)="modal.close()">BATAL</button>
+        <button type="button" class="btn btn-primary" (click)="c(activateProduct())">NONAKTIFKAN</button>
+    </div>
+</ng-template>
+
+<!--Modal Aktifkan Produk-->
+<ng-template #enableProduct let-modal let-c="close">
+
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <div class="event-icon d-flex">
+                <div>
+                    <img src="https://cdn-dev.oss-ap-southeast-5.aliyuncs.com/doku-ui-framework/doku/img/modal-ornament/warning-icon.png"
+                         alt="">
+                </div>
+                <div class="header-content">
+                    <h4>Aktifkan Produk?</h4>
+                </div>
+            </div>
+        </h5>
+
+    </div>
+    <div class="modal-body">
+        <div class="background">
+            Produk akan diaktifkan dan akan tertampil pada website pelanggan Anda.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-link" (click)="modal.close()">BATAL</button>
+        <button type="button" class="btn btn-primary" (click)="c(activateProduct())">AKTIFKAN</button>
+    </div>
+</ng-template>
+
+<!--Modal Change To Configuration-->
+<ng-template #configurationModal let-modal let-c="close">
+
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <div class="event-icon d-flex">
+                <div>
+                    <img src="https://cdn-dev.oss-ap-southeast-5.aliyuncs.com/doku-ui-framework/doku/img/modal-ornament/warning-icon.png" alt="">
+                </div>
+                <div class="header-content mt-auto mb-auto ">
+                    <h4>Profil Toko</h4>
+                </div>
+            </div>
+        </h5>
+
+    </div>
+    <div class="modal-body">
+        <div class="background">
+            Sebelum mengaktifkan fitur ini, mohon isikan terlebih dahulu profil toko Anda.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="c(configurationStore())">OK</button>
+    </div>
+</ng-template>

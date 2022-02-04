@@ -1,0 +1,208 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded">
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+<!-- Loading Complete -->
+<ng-template #loaded>
+    <div class="max-screen-sm mx-auto">
+        <div class="header">
+            <div class="row">
+                <div class="brand col-10">
+                    <div class="brand-logo">
+                        <img id="merchantLogo" src="{{merchantInfo?.image}}" alt=""/>
+                    </div>
+                    <div class="brand-name pl-3">
+                        <b id="merchantName">{{merchantInfo?.name}}</b>
+                        <img
+                                class="powered-jokul"
+                                src="https://cdn-dev.oss-ap-southeast-5.aliyuncs.com/doku-ui-framework/doku/img/jokul/jokul-retail/retail-powered-by-jokul.png"
+                                alt=""
+                        />
+                    </div>
+                </div>
+                <div class="cart-button col-2">
+                    <a class="text-dark" (click)="btnCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="store-top-section d-flex flex-column">
+            <div class="d-flex flex-row align-items-center" style="text-transform: capitalize;">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="merchantAddress">Dikirim dari {{merchantInfo?.city.name}}</span>
+            </div>
+            <div class="d-flex flex-row align-items-center">
+                <i class="fas fa-tags"></i>
+                <span id="totalSoldProduct">{{merchantInfo?.totalSoldProduct}} Produk Terjual</span>
+            </div>
+        </div>
+        <hr/>
+        <div class="store-filter-bar">
+            <div class="form-group m-0">
+                <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Cari produk"
+                        id="inputSearch"
+                        [(ngModel)]="inputSearch"
+                />
+                <i class="fas fa-search field-icon" id="iconSearch" onclick=""></i>
+            </div>
+            <button (click)="toggleBtmSheetSort()" class="btn btn-outline-primary btn-icon btn-sort" id="sortProduct">
+                <i class="fas fa-sliders-h"></i>
+            </button>
+            <button (click)="toggleBtmSheetFilter()" class="btn btn-secondary btn-icon btn-filter" id="filterProduct">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        <div *ngIf="filterProductList?.length !== 0 && (filterProductList | searchFilter: inputSearch).length > 0; else noResults" class="store-catalog">
+            <div *ngFor="let product of filterProductList | searchFilter: inputSearch; let i = index" class="single-product">
+                <a style="text-decoration: none" (click)="clickProductName(product.link)">
+                    <img src="{{product?.images[0].url}}" alt="" id="productImage-{{i}}"/>
+                    <div class="single-product-name"  id="productName-{{i}}">
+                        {{product.name}}
+                    </div>
+                    <div class="d-flex flex-row justify-content-between align-items-center">
+                        <div class="single-product-price" id="productPrice-{{i}}">{{convertPriceValue(product.variants[0].price)}}</div>
+                        <div class="pr-2" style="float: right" id="soldProduct-{{i}}">{{product?.soldProduct}} terjual</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+        <ng-template #noResults>
+                <div class="d-flex justify-content-center w-100 align-content-center flex-column align-items-center" style="margin-top: 5rem">
+                    <div>
+                        <img id="imageProductNotFound" src="https://cdn-dev.oss-ap-southeast-5.aliyuncs.com/doku-ui-framework/doku/img/jokul/jokul-retail/product-not-found.png" alt=""/>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                        <h4 id="titleProductNotFound">Produk Tidak Ditemukan</h4>
+                </div>
+        </ng-template>
+        <div
+                class="bottom-sheet"
+                *ngIf="showBottomSheetFilter"
+                id="buttomSheet"
+                #bottomSheet>
+            <div class="backdrop" (click)="toggleBtmSheetFilter()"></div>
+            <div
+                    class="bottom-sheet-container"
+                    [ngClass]="showBottomSheetFilter ? 'slideTop' : 'slideDown'"
+            >
+                <div class="sheet-line"></div>
+                <div class="sheet-container">
+                    <h4>Filter Kategori</h4>
+                    <ul>
+                        <li *ngFor="let category of merchantProductCategory; let j = index">
+                            <div class="form-check mb-2">
+                                <input (click)="filterProductBy(category.name)" [checked]="checkedFilterProductBy(category.name)"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="{{'category-' + j}}"
+                                       id="{{'category-' + j}}"
+                                       value="{{category.name}}"
+                                />
+                                <label class="form-check-label" for="{{'category-' + j}}">
+                                    {{category.name}}
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check mb-2">
+                                <input (click)="filterProductBy('noFilter')" [checked]="checkedFilterProductBy('noFilter')"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="noFilter"
+                                       id="noFilter"
+                                       value="noFilter"
+                                />
+                                <label class="form-check-label" for="noFilter">
+                                    No Filter
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div
+                class="bottom-sheet"
+                *ngIf="showBottomSheetSort"
+                id="buttomSheet1"
+                [ngClass]="showBottomSheetSort ? 'slideTop' : 'slideDown'"
+                #bottomSheet>
+            <div class="backdrop" (click)="toggleBtmSheetSort()"></div>
+            <div
+                    class="bottom-sheet-container"
+                    [ngClass]="toggleBtmSheetSort ? 'slideTop' : 'slideDown'">
+                <div class="sheet-container">
+                    <div class="sheet-line"></div>
+                    <h4>Urutkan Berdasarkan</h4>
+                    <ul>
+                        <li>
+                            <div class="form-check mb-2">
+                                <input (click)="orderProductBy(sortByEnum.LOWEST_PRICE)" [checked]="checkSortingValueChoose(sortByEnum.LOWEST_PRICE)"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="sortByLowestPrice"
+                                       id="sortByLowestPrice"
+                                       value="lowestPrice"
+                                />
+                                <label class="form-check-label" for="sortByLowestPrice">
+                                    {{sortByEnum.LOWEST_PRICE}}
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check mb-2">
+                                <input (click)="orderProductBy(sortByEnum.HIGHEST_PRICE)" [checked]="checkSortingValueChoose(sortByEnum.HIGHEST_PRICE)"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="sortByHighestPrice"
+                                       id="sortByHighestPrice"
+                                       value="highestPrice"
+                                />
+                                <label class="form-check-label" for="sortByHighestPrice">
+                                    {{sortByEnum.HIGHEST_PRICE}}
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check mb-2">
+                                <input (click)="orderProductBy(sortByEnum.NEWEST_PRODUCT)" [checked]="checkSortingValueChoose(sortByEnum.NEWEST_PRODUCT)"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="sortByNewestProduct"
+                                       id="sortByNewestProduct"
+                                       value="newestProduct"
+                                />
+                                <label class="form-check-label" for="sortByNewestProduct">
+                                    {{sortByEnum.NEWEST_PRODUCT}}
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check mb-2">
+                                <input (click)="orderProductBy(sortByEnum.BEST_SELLER_PRODUCT)" [checked]="checkSortingValueChoose(sortByEnum.BEST_SELLER_PRODUCT)"
+                                       class="form-check-input"
+                                       type="radio"
+                                       name="sortByBestSeller"
+                                       id="sortByBestSeller"
+                                       value="bestSeller"
+                                />
+                                <label class="form-check-label" for="sortByBestSeller">
+                                    {{sortByEnum.BEST_SELLER_PRODUCT}}
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

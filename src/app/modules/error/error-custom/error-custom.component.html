@@ -1,0 +1,40 @@
+<!-- Error KYB-->
+<ng-container *ngIf="typeError === kybCodeOld; else kybCode">
+  <div class="container h-100">
+    <div class="error-holder d-flex align-content-end">
+      <div class="wrapper d-flex flex-column align-items-center">
+        <div class="wrapper--center m-auto">
+          <div class="response card" style="height:100%;">
+            <div class="card-body">
+              <div class="response-head text-center d-flex flex-column mb-2 align-items-center" style="margin-bottom: 40px !important">
+                <img class="response-logo" src="./assets/images/icon-failed.svg" alt="">
+              </div>
+              <div>
+                <p>Kepada Merchant,</p>
+                <p class="text-justify">Mohon maaf atas ketidaknyamanannya, Bisnis Anda tidak bisa mengakses layanan ini. Mohon segera lengkapi dokumen pendaftaran bisnis Anda dan kami akan memproses pendaftaran bisnis Anda maksimal 2 hari kerja.</p>
+                <p class="text-justify">Jika ada pertanyaan lebih lanjut, silahkan menghubungi kami melalui Menu Help Jokul.</p>
+                <p>Terima Kasih</p>
+                <hr>
+                <p>Dear Merchant,</p>
+                <p class="text-justify">We apologize for the inconvenience, your business account was not yet verified by our team. Please ensure you already submitted all of the required documents and kindly waiting for the verification process maximum of 2 working days.</p>
+                <p class="text-justify">If there are any concerns, please contact us through Help Menu on Jokul.</p>
+                <p>Thank you</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #kybCode>
+  <ng-container *ngIf="typeError === 'kyb'; else error3">
+    <!-- Fill in this ng-container for Error 2 -->
+  </ng-container>
+</ng-template>
+
+<ng-template #error3>
+  <!-- Fill in this ng-container for Error 3 -->
+  <h1>ERROR 3</h1>
+</ng-template>

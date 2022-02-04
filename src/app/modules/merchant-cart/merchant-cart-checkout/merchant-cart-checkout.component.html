@@ -1,0 +1,494 @@
+<!-- Logic Loading if Not Complete -->
+<div *ngIf="loading else loaded">
+    <div class="center">
+        <div class="spinner-border text-primary spinner-sm mr-5" role="status"></div>
+    </div>
+</div>
+
+<!-- Loading Complete -->
+<ng-template #loaded>
+
+    <!-- Customer Facing Merchant Checkout -->
+    <ng-container *ngIf="pageName === 'merchant-checkout'">
+        <div class="max-screen-sm mx-auto">
+            <div class="row pt-3 text-center">
+                <div class="col-11">
+                    <button class="btn float-left" (click)="btnBack()" id="backButton" type="button">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-center" style="font-size: 16px; font-weight: bold">Checkout</span>
+                </div>
+            </div>
+
+            <div class="">
+                <div class="col-12">
+                    <div class="card-body">
+                        <ngb-accordion activeIds="checkoutSummary" class="summary-accordion">
+                            <ngb-panel id="checkoutSummary">
+                                <ng-template ngbPanelHeader let-opened="opened">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <button ngbPanelToggle
+                                                class="btn btn-link d-inline-flex container-fluid text-left pl-0 col">
+                                            <h4 class="mb-0">Ringkasan Belanja</h4>
+                                        </button>
+
+                                        <button ngbPanelToggle
+                                                class="btn btn-link d-inline-flex float-right pr-0 col-md-auto text-right">
+                                            <h4 class="mb-0 mr-2">
+                                                <span>{{(cartProduct.totalPrice) | currency:'Rp ':'symbol-narrow':'1.0' }}</span>
+
+                                            </h4>
+                                            <span [ngClass]="opened ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></span>
+                                        </button>
+                                    </div>
+                                </ng-template>
+                                <ng-template ngbPanelContent>
+                                    <div class="row mb-0 pl-2">
+                                        <div class="col">
+                                            <div *ngFor="let product of cartProduct.cartItems; let i = index">
+                                                <div *ngFor="let variant of product.items; let i = index">
+                                                    <div class="row mb-2">
+                                                        <div class="col-2 mb-auto mt-auto px-0">
+                                                            <img [src]="product?.product.image" class="img-fluid rounded" style="height: 64px; width: 100%"
+                                                                 alt=""/>
+                                                        </div>
+                                                        <div class="col-9 mb-auto mt-auto">
+                                                            <div class="row mb-0">
+                                                                <div class="col">
+                                                                    <h5>{{product.product.name}}</h5>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <div class="row mb-0">
+                                                                    <div class="col">
+                                                                        <h6 class="text-muted">{{variant.color}}</h6>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <h5 class="text-muted">{{variant.price | currency:'Rp ':'symbol-narrow':'1.0'}}
+                                                                            <span>{{'x ' + variant.quantity}}</span>
+                                                                        </h5>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </ngb-panel>
+                        </ngb-accordion>
+
+
+                        <hr>
+                        <form (ngSubmit)="submitCheckout()" [formGroup]="checkoutForm" class="pt-10" id="checkoutForm">
+                            <ngb-accordion activeIds="contactInformation" class="form-accordion">
+                                <ngb-panel id="contactInformation">
+                                    <ng-template ngbPanelHeader let-opened="opened">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <button ngbPanelToggle class="btn btn-link container-fluid text-left pl-0">
+                                                <h4>Informasi Kontak</h4></button>
+
+                                            <button ngbPanelToggle class="btn btn-link p-0"><span
+                                                    [ngClass]="opened ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></span>
+                                            </button>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template ngbPanelContent>
+                                        <div class="form-group">
+                                            <label style="font-weight: bolder">Nama Penerima</label>
+                                            <input type="text" id="name" formControlName="name"
+                                                   pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$"
+                                                   class="form-control dk-text-input" required
+                                                   placeholder="Masukkan nama penerima">
+                                            <p class="text-danger"
+                                               *ngIf="checkoutForm.get('name').hasError('required') && (checkoutForm.get('name').dirty || checkoutForm.get('name').touched)">
+                                                *This field is cannot be left empty</p>
+                                            <p class="text-danger" *ngIf="checkoutForm.get('name').hasError('pattern')">
+                                                *This field is not valid input text</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label style="font-weight: bolder">Nomor Handphone</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text dk-span-group"
+                                                          id="countryCode">+62</span>
+                                                </div>
+                                                <input type="text" id="phoneNumber" formControlName="phoneNumber"
+                                                       pattern="^[1-9][0-9]*$" class="form-control dk-text-input"
+                                                       required placeholder="81197216322"
+                                                       (keypress)="validationService.numberOnly($event)">
+                                            </div>
+                                            <p class="text-danger"
+                                               *ngIf="checkoutForm.get('phoneNumber').hasError('required') && (checkoutForm.get('phoneNumber').dirty || checkoutForm.get('phoneNumber').touched)">
+                                                *This field is cannot be left empty</p>
+                                            <p class="text-danger"
+                                               *ngIf="checkoutForm.get('phoneNumber').hasError('pattern')">*This field
+                                                is not valid input text</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label style="font-weight: bolder">Email</label>
+                                            <input type="text" id="email" formControlName="email"
+                                                   class="form-control dk-text-input" placeholder="Masukkan email">
+                                            <p class="text-danger"
+                                               *ngIf="checkoutForm.get('email').hasError('required') && (checkoutForm.get('email').dirty || checkoutForm.get('email').touched)">
+                                                *This field is cannot be left empty</p>
+                                            <p class="text-danger"
+                                               *ngIf="checkoutForm.get('email').hasError('invalidEmail')">*This field is
+                                                not valid input text</p>
+                                        </div>
+                                    </ng-template>
+                                </ngb-panel>
+                            </ngb-accordion>
+                            <hr>
+                            <!-- Hide if Category is Digital Goods -->
+                            <ngb-accordion activeIds="shippingInformation" class="form-accordion"
+                                           *ngIf="cartProduct?.cartItems[0]?.items[0]['digitalGoods'] === false">
+                                <ngb-panel id="shippingInformation">
+                                    <ng-template ngbPanelHeader let-opened="opened">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <button ngbPanelToggle class="btn btn-link container-fluid text-left pl-0">
+                                                <h4>Informasi Pengiriman</h4></button>
+
+                                            <button ngbPanelToggle class="btn btn-link p-0"><span
+                                                    [ngClass]="opened ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></span>
+                                            </button>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template ngbPanelContent>
+                                        <div class="form-group">
+                                            <div><h5>Alamat (Kode POS-Kota-Provinsi)</h5></div>
+                                            <div>
+                                                <ng-select [clearable]="false" formControlName="postalCode"
+                                                           [items]="location.postalCode" bindLabel="name"
+                                                           [multiple]="false" [closeOnSelect]="true">
+                                                </ng-select>
+                                                <p class="text-danger"
+                                                   *ngIf="checkoutForm.get('postalCode').hasError('required')  && (checkoutForm.get('postalCode').dirty || checkoutForm.get('postalCode').touched)">
+                                                    *This field is cannot be left empty</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div><h5>Alamat Lengkap</h5></div>
+                                            <div>
+                                                <textarea formControlName="address" rows="4"
+                                                          class="form-control dk-text-input" id="address"
+                                                          placeholder="Nama jalan, No. Rumah" required
+                                                          pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$"></textarea>
+                                                <p class="text-danger"
+                                                   *ngIf="checkoutForm.get('address').hasError('required')  && (checkoutForm.get('address').dirty || checkoutForm.get('address').touched)">
+                                                    *This field is cannot be left empty</p>
+                                                <p class="text-danger"
+                                                   *ngIf="checkoutForm.get('address').hasError('pattern')">*This field
+                                                    is not valid input text</p>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+                                        <div class="form-group">
+                                            <div><h4>Metode Pengiriman</h4></div>
+                                            <div *ngIf="selectedShipping === null">
+                                                <button class="btn btn-link border-secondary text-left text-secondary pt-3"
+                                                        (click)="openModalStatusProduct(logisticModal)"
+                                                        style="width: 100%; text-decoration: none">PILIH JASA PENGIRIMAN
+                                                    <span class="fas fa-chevron-right float-right"></span></button>
+                                            </div>
+
+                                            <div *ngIf="selectedShipping !== null">
+                                                <div class="row">
+                                                    <div class="col-10">
+                                            <span style="font-weight: bold">{{selectedShipping?.details[0]?.name + ' - ' + selectedShipping?.details[0]?.rateName + ' (' +
+                                            (selectedShipping?.details[0]?.totalRate | currency:'Rp ':'symbol-narrow':'1.0') + ')'}}</span>
+                                                        <br>
+                                                        <span>Akan diterima pada {{ addDate(selectedShipping?.details[0]?.minDay, selectedShipping?.details[0]?.maxDay) }}</span>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <button class="btn"
+                                                                (click)="openModalStatusProduct(logisticModal)">
+                                                            <i class="fas fa-chevron-right"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2 d-flex">
+                                                    <div class="col">
+                                            <span class="font-weight-bold">
+                                                Asuransi Pengiriman <i class="fas fa-info-circle pointer-cursor"
+                                                                       placement="top"
+                                                                       ngbTooltip="Asuransi Pengiriman"></i>
+                                            </span>
+                                                    </div>
+                                                    <div class="col" style="text-align: right">
+                                                        <label class="checkbox mr-2">
+                                                            <span class="font-weight-bold">{{selectedShipping?.details[0]?.insuranceRate | currency:'Rp ':'symbol-narrow':'1.0'}} </span>
+                                                            <input name="vertical-check" type="checkbox"
+                                                                   [checked]="true" disabled
+                                                                   *ngIf="selectedShipping?.details[0].compulsoryInsurance === true">
+                                                            <input name="vertical-check" [checked]="isChecked"
+                                                                   (change)="changed($event)" type="checkbox"
+                                                                   *ngIf="selectedShipping?.details[0].compulsoryInsurance === false">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+                                    </ng-template>
+                                </ngb-panel>
+                            </ngb-accordion>
+
+
+                            <div class="form-group">
+                                <div><h4>Catatan ke penjual (opsional)</h4></div>
+                                <div>
+                                    <textarea formControlName="notes" rows="4" class="form-control dk-text-input"
+                                              id="notes" placeholder="Catatan tambahan untuk penjual"
+                                              pattern="^[a-zA-Z0-9.\\-\\/+,=_:'@%| ]*$" rows="4"
+                                              maxlength="260"></textarea>
+                                    <div class="text-danger" *ngIf="checkoutForm.get('notes').hasError('pattern')">*This
+                                        field is not valid input text
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="bottom-card">
+                                    <div class="row px-3">
+                                        <div class="col-12 mb-4">
+                                           <span>
+                                                Dengan membayar, saya menyetujui, bahwa penjual dapat menyimpan dan menggunakan informasi pribadi saya, berikut
+                                               <a class="text-primary pointer-cursor" (click)="openTermsAndCondition()">Syarat dan Ketentuan</a>
+                                               dan <a class="text-primary pointer-cursor" (click)="openPrivacyPolicy()">Kebijakan Privasi</a> Jokul.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row px-3">
+                                        <div class="col">
+                                            <span class="text-muted">Sub Total</span>
+                                        </div>
+                                        <div class="col">
+                                            <h4 class="text-right">{{(ongkosKirim + cartProduct.totalPrice) | currency:'Rp ':'symbol-narrow':'1.0' }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row px-3">
+                                        <div class="col-12 mt-3">
+                                            <div>
+                                                <div class="w-100">
+                                                    <div class="responsive-layout--button-action justify-content-end w-100">
+                                                        <button style="width: 100%" class="btn btn-primary"
+                                                                id="submitCheckout" [disabled]="!checkoutForm.valid">
+                                                            BAYAR
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+</ng-template>
+
+
+<!--Modal Pilih Logistik-->
+<ng-template #logisticModal let-modal>
+
+    <div class="modal-header striped">
+        <h4 class="modal-title" id="modal-basic-title">Pilih Metode Pengiriman</h4>
+    </div>
+    <div class="modal-body">
+
+        <form action="">
+            <div class="form-group">
+
+
+                <!-- Instant Shipping -->
+                <div *ngIf="shipping?.instant?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let instant of shipping?.instant?.details; let i = index">
+
+                        <div class="col-1">
+                            <input name="shipping" type="radio" id="instantShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.instant.type, instant)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{instant.name + ' - ' + instant.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(instant.minDay, instant.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{instant.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+                <!-- Same Day Shipping -->
+                <div *ngIf="shipping?.sameDay?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let sameDay of shipping?.sameDay?.details; let i = index">
+
+                        <div class="col-1">
+                            <input name="shipping" type="radio" id="sameDayShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.sameDay.type, sameDay)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{sameDay.name + ' - ' + sameDay.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(sameDay.minDay, sameDay.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{sameDay.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+                <!-- Regular Shipping -->
+                <div *ngIf="shipping?.regular?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let regular of shipping?.regular?.details; let i = index">
+
+                        <div class="col-1">
+                            <input name="shipping" type="radio" id="regularShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.regular.type, regular)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{regular.name + ' - ' + regular.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(regular.minDay, regular.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{regular.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+                <!-- Express Shipping -->
+                <div *ngIf="shipping?.express?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let express of shipping?.express?.details; let i = index">
+
+                        <div class="col-1">
+                            <input name="shipping" type="radio" id="expressShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.express.type, express)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{express.name + ' - ' + express.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(express.minDay, express.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{express.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+                <!-- Trucking Shipping -->
+                <div *ngIf="shipping?.trucking?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let trucking of shipping?.trucking?.details; let i = index">
+                        <div class="col-1">
+                            <input name="shipping" type="radio" id="truckingShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.trucking.type, trucking)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{trucking.name + ' - ' + trucking.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(trucking.minDay, trucking.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{trucking.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+                <!-- Digital Shipping -->
+                <div *ngIf="shipping?.digital?.details?.length > 0">
+                    <div class="row pt-3" *ngFor="let digital of shipping?.digital?.details; let i = index">
+
+                        <div class="col-1">
+                            <input name="digital" type="radio" id="digitalShipping-{{i}}"
+                                   (click)="setTempShipping(shipping.digital.type, digital)">
+                        </div>
+
+                        <div class="col-7">
+                            <h4>{{digital.name + ' - ' + digital.rateName}}</h4>
+                            <span>Akan diterima pada {{ addDate(digital.minDay, digital.maxDay) }}</span>
+                        </div>
+
+                        <div class="col-3 mt-auto mb-auto" style="text-align: right">
+                            <span class="font-weight-bold mt-auto mb-auto">{{digital.totalRate | currency:'Rp ':'symbol-narrow':'1.0'}}</span>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+                <!-- Shipping Not Support -->
+                <div *ngIf="shipping?.instant?.details?.length == 0 &&
+                        shipping?.sameDay?.details?.length == 0 &&
+                        shipping?.regular?.details?.length == 0 &&
+                        shipping?.express?.details?.length == 0 &&
+                        shipping?.trucking?.details?.length == 0">
+                    <div class="row pt-3">
+                        <div class="col mt-auto mb-auto" style="text-align: center">
+                            <h4 class="mt-auto mb-auto">Pengiriman Tidak Mendukung</h4>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close(clearShipping())">BATAL</button>
+        <button type="button" [disabled]="(shipping?.instant?.details?.length == 0 &&
+        shipping?.sameDay?.details?.length == 0 &&
+        shipping?.regular?.details?.length == 0 &&
+        shipping?.express?.details?.length == 0 &&
+        shipping?.trucking?.details?.length == 0) || checkoutForm.get('shipping').value == null"
+                class="btn btn-primary" (click)="modal.close(setShipping())">PILIH
+        </button>
+    </div>
+</ng-template>
+
+
+<!--Modal Success Checkout-->
+<ng-template #successCheckout let-modal>
+
+    <div class="modal-header striped">
+        <h3 class="modal-title" id="modal-success-title">Pesanan Telah Berhasil dibuat</h3>
+    </div>
+    <div class="modal-body">
+        <h4>Link pembayaran sebagai berikut :</h4>
+        <br>
+        <span class="text-primary"><b>{{staticLink + " "}}</b></span> <i class="fas fa-link" style="cursor: pointer"
+                                                                         (click)="copyMessage(decodeURI(staticLink))"></i>
+        <br>
+        <br>
+        <h4>Mohon link disimpan dengan baik</h4>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close(jcButton())">Ok</button>
+    </div>
+</ng-template>

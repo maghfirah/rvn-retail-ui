@@ -1,0 +1,73 @@
+/* css for loading page */
+::ng-deep.content-wrapper {
+    padding: 0!important;
+}
+.center {
+    width: fit-content;
+    height: fit-content;
+    position: fixed;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.max-screen-sm {
+    max-width: 480px;
+    min-height: 100vh;
+    background-color: #fff;
+    padding-bottom: 10px;
+}
+
+
+/* css for customer facing */
+.container-mobile {
+    min-width: 360px;
+    max-width: 600px;
+    margin: -24px auto -45px;
+    background-color: rgb(255, 255, 255);
+    min-height: 100vh;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .container-mobile {margin: -24px -24px -45px}
+}
+
+/* bottom card */
+.bottom-card {
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    margin: 0 -20px;
+    padding: 25px 24px 32px;
+    /*padding-top: 24px;*/
+    /*padding-bottom: 32px;*/
+}
+
+/* accordion*/
+:host::ng-deep.form-accordion > .card{
+    border: none;
+}
+:host::ng-deep.form-accordion > .card .card-header{
+    padding: 0;
+    border-bottom: none;
+}
+
+:host::ng-deep.form-accordion button.btn, :host::ng-deep.summary-accordion button.btn{
+    text-transform: capitalize;
+    color: black;
+    text-decoration: none!important;
+}
+
+:host::ng-deep.form-accordion > .card .card-body{
+    padding: 10px 0 0!important;
+}
+
+:host::ng-deep.summary-accordion > .card{
+    background-color: #F0F0F0;
+;
+}
+:host::ng-deep.summary-accordion > .card .card-header{
+    padding: 10px;
+}

@@ -1,0 +1,29 @@
+.summary-transaction .card {
+    background: #FFFFFF;
+    border: none;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.summary-product .card {
+    border: none;
+}
+.summary-transaction .card  a, .summary-product .card  a {
+    transition: 0.7s;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #4D4D4D;
+}
+.summary-transaction .card h3 {
+    color: #E1251B;
+}
+.summary-transaction .card  a:hover, .summary-product .card  a:hover {
+    background-color: #FFD8CD;
+}
+
+@media (min-width: 576px) {
+    .summary-transaction.summary-border, .summary-product.summary-border{
+        border-right: solid 1px #E6E6E6!important;
+    }
+}
